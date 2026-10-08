@@ -1,0 +1,1359 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>IS 402 SQL Handbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,600..800&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: slim top bar (title + search), quiet topic list on the left, one topic at a time in a single 740px reading column. Minimal chrome: hairlines and soft fills, no stacked cards. */
+:root {
+  --bg: #fcfcfd;
+  --side: #f5f7fa;
+  --sunk: #f0f3f7;
+  --fg: #19212c;
+  --muted: #627084;
+  --line: #e2e7ee;
+  --accent: #2b53c6;
+  --accent-soft: #e9eefc;
+  --warn: #b04a1c;
+  --pk: #94620a;
+  --fk: #1f705c;
+  --kw: #2b53c6;
+  --str: #1f705c;
+  --cm: #8590a0;
+  --shadow: 0 10px 30px rgba(20, 30, 50, 0.12);
+  --font-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", Consolas, monospace;
+  --bar: 56px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11161d; --side: #141a22; --sunk: #1a212b; --fg: #e4e9f0; --muted: #98a4b4; --line: #252f3c;
+    --accent: #8eacff; --accent-soft: #1d2842; --warn: #ff9f75; --pk: #f0c06a; --fk: #6fd3b4;
+    --kw: #8eacff; --str: #6fd3b4; --cm: #7a8798; --shadow: 0 10px 30px rgba(0, 0, 0, 0.45); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11161d; --side: #141a22; --sunk: #1a212b; --fg: #e4e9f0; --muted: #98a4b4; --line: #252f3c;
+  --accent: #8eacff; --accent-soft: #1d2842; --warn: #ff9f75; --pk: #f0c06a; --fk: #6fd3b4;
+  --kw: #8eacff; --str: #6fd3b4; --cm: #7a8798; --shadow: 0 10px 30px rgba(0, 0, 0, 0.45); color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16.5px; line-height: 1.6; padding-inline: 0; padding-block: 0; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code, pre { font-family: var(--font-mono); font-size: 0.85em; }
+:not(pre) > code { background: var(--sunk); padding: 0.05em 0.35em; border-radius: 4px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* Top bar */
+.topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; height: var(--bar); background: var(--bg); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 16px; padding-inline: 20px; }
+.brand { font-family: var(--font-display); font-weight: 760; font-stretch: 85%; font-size: 18px; color: var(--fg); white-space: nowrap; width: 212px; flex: none; }
+.brand:hover { text-decoration: none; }
+.menu { display: none; flex: none; background: none; border: 0; color: var(--fg); padding: 6px; margin-left: -6px; cursor: pointer; border-radius: 6px; }
+.menu svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 2; display: block; }
+.search { position: relative; flex: 1; max-width: 520px; min-width: 0; }
+.search input { width: 100%; font: 400 15.5px var(--font-body); padding: 8px 40px 8px 36px; border: 1px solid var(--line); border-radius: 8px; background: var(--sunk); color: var(--fg); }
+.search input:focus { outline: none; border-color: var(--accent); background: var(--bg); box-shadow: 0 0 0 3px var(--accent-soft); }
+.search > svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; stroke: var(--muted); fill: none; stroke-width: 2; pointer-events: none; }
+.search kbd { position: absolute; right: 9px; top: 50%; transform: translateY(-50%); font: 600 11px var(--font-mono); color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 6px; background: var(--bg); }
+@media (hover: none) { .search kbd { display: none; } }
+.results { position: absolute; top: calc(100% + 6px); left: 0; right: 0; min-width: 340px; max-height: 70vh; overflow-y: auto; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); padding: 6px 0; }
+.results h4 { margin: 6px 0 2px; padding: 0 14px; font: 600 10.5px var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.results a { display: block; padding: 6px 14px; color: var(--fg); }
+.results a:hover, .results a:focus { background: var(--accent-soft); text-decoration: none; outline: none; }
+.results .rt { display: block; font-weight: 600; font-size: 15px; }
+.results .rd { display: block; font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; }
+.results a.tp .rd { font-family: var(--font-body); font-size: 13.5px; }
+.results .none { padding: 10px 14px; color: var(--muted); }
+
+/* Shell */
+.shell { display: grid; grid-template-columns: 252px minmax(0, 1fr); min-height: calc(100vh - var(--bar)); }
+nav.side { position: sticky; top: calc(var(--bar) + env(safe-area-inset-top, 0px)); align-self: start; height: calc(100vh - var(--bar)); overflow-y: auto; background: var(--side); border-right: 1px solid var(--line); padding: 20px 14px 40px 20px; scrollbar-width: thin; }
+nav.side .grp { font: 600 10.5px var(--font-mono); letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); margin: 20px 10px 4px; }
+nav.side .grp:first-of-type { margin-top: 12px; }
+nav.side a { display: block; color: var(--fg); padding: 4px 10px; border-radius: 6px; font-size: 15px; }
+nav.side a:hover { background: var(--sunk); text-decoration: none; }
+nav.side a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+main { min-width: 0; padding: 44px 56px 96px; }
+.view { max-width: 740px; }
+.scrim { display: none; }
+
+@media (max-width: 900px) {
+  .brand { width: auto; }
+  .menu { display: block; }
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  nav.side { position: fixed; z-index: 25; left: 0; top: calc(var(--bar) + env(safe-area-inset-top, 0px)); bottom: 0; height: auto; width: min(290px, 86vw); transform: translateX(-102%); transition: transform .2s ease; box-shadow: var(--shadow); }
+  body.nav-open nav.side { transform: none; }
+  body.nav-open .scrim { display: block; position: fixed; inset: 0; z-index: 20; background: rgba(10, 15, 25, 0.35); }
+  main { padding: 28px 16px 80px; }
+  .results { position: fixed; top: calc(var(--bar) + env(safe-area-inset-top, 0px) + 4px); left: 8px; right: 8px; min-width: 0; }
+}
+@media (max-width: 520px) { .brand { display: none; } .topbar { padding-inline: 12px; gap: 10px; } }
+
+/* Topic typography */
+.view > header { margin-bottom: 26px; }
+.eyebrow { font: 600 11px var(--font-mono); letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+h1, .view h2 { font-family: var(--font-display); font-stretch: 82%; font-weight: 780; font-size: clamp(30px, 4.4vw, 40px); line-height: 1.05; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+.use { font-size: 18px; color: var(--muted); margin: 10px 0 0; max-width: 62ch; }
+.use b { color: var(--fg); font-weight: 600; }
+h3 { font-family: var(--font-display); font-stretch: 92%; font-weight: 700; font-size: 18px; margin: 34px 0 10px; }
+p, li { max-width: 68ch; }
+.how { margin: 0 0 8px; }
+.how > b:first-child { display: block; font: 600 11px var(--font-mono); letter-spacing: 0.09em; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
+.how p { margin: 0 0 8px; }
+
+.code { position: relative; margin: 14px 0 20px; min-width: 0; }
+.code .cap { font-size: 14px; color: var(--muted); margin: 0 0 6px; }
+.code pre { margin: 0; background: var(--sunk); border-radius: 8px; padding: 14px 16px; overflow-x: auto; line-height: 1.6; }
+.code button { position: absolute; top: 8px; right: 8px; font: 600 10.5px var(--font-mono); letter-spacing: 0.05em; text-transform: uppercase; background: var(--bg); color: var(--muted); border: 1px solid var(--line); border-radius: 5px; padding: 2px 8px; cursor: pointer; opacity: 0; transition: opacity .15s; }
+.code.capd button { top: 35px; }
+.code:hover button, .code button:focus { opacity: 1; }
+@media (hover: none) { .code button { opacity: 1; } }
+.k { color: var(--kw); font-weight: 600; }
+.s { color: var(--str); }
+.c { color: var(--cm); font-style: italic; }
+
+.tw { position: relative; overflow-x: auto; margin: 14px 0 22px; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+th, td { text-align: left; padding: 8px 14px 8px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 600 10.5px var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding-bottom: 6px; }
+td:first-child { color: var(--muted); }
+td code { white-space: nowrap; }
+td.wrap code { white-space: normal; }
+.tw.plain td:first-child { color: var(--fg); }
+
+.traps { margin: 30px 0 0; padding-left: 16px; border-left: 2px solid var(--warn); }
+.traps > b { display: block; color: var(--warn); font: 600 11px var(--font-mono); letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 4px; }
+.traps ul { margin: 0; padding-left: 18px; }
+.traps li { margin-bottom: 5px; }
+.note { margin: 14px 0; padding: 12px 16px; background: var(--sunk); border-radius: 8px; }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0 16px; }
+.two > * { min-width: 0; }
+ol.flow { list-style: none; counter-reset: f; padding: 0; margin: 14px 0 22px; display: flex; flex-wrap: wrap; gap: 6px; }
+ol.flow li { counter-increment: f; background: var(--sunk); border-radius: 6px; padding: 5px 10px; font-family: var(--font-mono); font-size: 13px; display: flex; gap: 8px; align-items: baseline; }
+ol.flow li::before { content: counter(f); color: var(--accent); font-weight: 600; }
+ol.flow li small { font-family: var(--font-body); color: var(--muted); font-size: 12.5px; }
+ol.steps { padding-left: 1.3em; }
+ol.steps li { margin-bottom: 8px; }
+.jdemo { font-family: var(--font-mono); font-size: 13px; }
+.jdemo td { white-space: nowrap; color: var(--fg); }
+.pill { display: inline-block; min-width: 24px; text-align: center; border-radius: 4px; padding: 0 5px; margin: 1px 2px; background: var(--accent-soft); color: var(--accent); }
+.pill.n { background: var(--sunk); color: var(--muted); }
+
+/* Prev / next */
+.pager { display: flex; justify-content: space-between; gap: 16px; margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--line); }
+.pager a { display: block; min-width: 0; }
+.pager a small { display: block; font: 600 10.5px var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.pager a span { font-weight: 600; font-size: 16px; }
+.pager .next { text-align: right; margin-left: auto; }
+
+/* Home */
+.home h1 { font-size: clamp(36px, 5.6vw, 54px); }
+.home .use { margin-bottom: 34px; }
+.quick { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 44px; }
+.quick a { display: block; padding: 14px 16px; background: var(--sunk); border-radius: 10px; color: var(--fg); min-width: 0; }
+.quick a:hover { background: var(--accent-soft); text-decoration: none; }
+.quick b { display: block; font-family: var(--font-display); font-stretch: 90%; font-size: 17px; }
+.quick span { font-size: 14px; color: var(--muted); }
+.groups { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 28px 32px; }
+.groups > div { min-width: 0; }
+.groups h3 { margin: 0 0 8px; font: 600 10.5px var(--font-mono); letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.groups ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.groups a { color: var(--fg); font-size: 16px; }
+.groups a:hover { color: var(--accent); }
+.hint { margin-top: 44px; color: var(--muted); font-size: 14px; }
+.hint kbd { font: 600 12px var(--font-mono); border: 1px solid var(--line); border-radius: 4px; padding: 0 6px; background: var(--sunk); }
+
+/* Filter inputs on list views */
+.filter { width: 100%; font: 400 15.5px var(--font-body); padding: 9px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--fg); margin-bottom: 8px; }
+.filter:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.tasklist h3 { margin: 28px 0 4px; font: 600 10.5px var(--font-mono); letter-spacing: 0.09em; text-transform: uppercase; color: var(--muted); }
+.tasklist a { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 4px 18px; padding: 9px 0; border-bottom: 1px solid var(--line); color: var(--fg); }
+.tasklist a:hover { text-decoration: none; background: linear-gradient(var(--accent-soft), var(--accent-soft)) no-repeat; background-size: 100% 100%; }
+.tasklist a code { background: none; padding: 0; color: var(--muted); overflow-wrap: anywhere; }
+@media (max-width: 600px) { .tasklist a { grid-template-columns: minmax(0, 1fr); } }
+.errlist .err { padding: 14px 0; border-bottom: 1px solid var(--line); }
+.errlist .err > code { display: block; background: none; padding: 0; font-size: 14px; font-weight: 600; color: var(--warn); overflow-wrap: anywhere; }
+.errlist .err p { margin: 4px 0 0; }
+.errlist .err p span { color: var(--muted); }
+
+/* Schemas */
+.sch-bar { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin-bottom: 18px; }
+.sch-bar select { font: 500 15px var(--font-mono); padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--fg); min-width: 0; max-width: 100%; }
+.seg { display: inline-flex; background: var(--sunk); border-radius: 8px; padding: 3px; }
+.seg button { font: 600 14px var(--font-body); border: 0; background: none; color: var(--muted); padding: 5px 14px; border-radius: 6px; cursor: pointer; }
+.seg button[aria-selected="true"] { background: var(--bg); color: var(--fg); box-shadow: 0 1px 2px rgba(0,0,0,.1); }
+.sch-meta { color: var(--muted); font-size: 14.5px; }
+.sch-notes { margin: 0 0 22px; padding-left: 18px; }
+.sch-notes li { margin-bottom: 4px; }
+.er { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.ent { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; min-width: 0; transition: box-shadow .3s, border-color .3s; }
+.ent.flash { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.ent header { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; margin-bottom: 6px; }
+.ent header b { font-family: var(--font-mono); font-size: 13.5px; overflow-wrap: anywhere; }
+.ent header small { color: var(--muted); font-size: 12px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ent ul { list-style: none; margin: 0; padding: 0; font-family: var(--font-mono); font-size: 12px; display: grid; gap: 1px; }
+.ent li { display: flex; justify-content: space-between; gap: 8px; max-width: none; padding: 0 3px; border-radius: 3px; }
+.ent li > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.ent li .t { color: var(--muted); white-space: nowrap; }
+.ent li.aud { opacity: 0.5; }
+.ent li.hit { background: var(--accent-soft); }
+.tag { font-size: 9.5px; font-weight: 600; margin-left: 5px; letter-spacing: 0.03em; }
+.tag.pk { color: var(--pk); }
+.tag.fk { color: var(--fk); }
+details.drv { margin-top: 18px; }
+details.drv summary { cursor: pointer; color: var(--muted); font-weight: 600; margin-bottom: 10px; }
+.legend { font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 18px; }
+</style>
+
+<header class="topbar">
+  <button class="menu" type="button" id="menu" aria-label="Show topics" aria-expanded="false" aria-controls="side"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  <a class="brand" href="#home">IS 402 SQL Handbook</a>
+  <div class="search" role="search">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+    <input type="search" id="q" placeholder="Search tasks, errors, columns…" aria-label="Search the handbook" autocomplete="off">
+    <kbd aria-hidden="true">/</kbd>
+    <div id="results" class="results" hidden></div>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="side" id="side" aria-label="Topics">
+    <a href="#home">Overview</a>
+    <div class="grp">Quick help</div>
+    <a href="#tasks">I want to…</a>
+    <a href="#errors">Error messages</a>
+    <a href="#rowcount">Wrong row count</a>
+    <div class="grp">Start</div>
+    <a href="#setup">Setup &amp; workflow</a>
+    <a href="#order">How a query runs</a>
+    <a href="#schemas">Schemas</a>
+    <div class="grp">Reading data</div>
+    <a href="#select">SELECT &amp; sorting</a>
+    <a href="#expr">Math &amp; expressions</a>
+    <a href="#where">Filtering</a>
+    <a href="#null">NULL &amp; blanks</a>
+    <a href="#text">Text</a>
+    <a href="#dates">Dates &amp; times</a>
+    <a href="#case">CASE</a>
+    <div class="grp">Combining tables</div>
+    <a href="#joins">Inner joins</a>
+    <a href="#outer">Outer joins</a>
+    <a href="#morejoins">Self, cross &amp; range joins</a>
+    <a href="#sets">UNION &amp; friends</a>
+    <div class="grp">Summarizing</div>
+    <a href="#agg">Aggregates &amp; GROUP BY</a>
+    <a href="#having">HAVING</a>
+    <a href="#window">Window functions</a>
+    <div class="grp">Nesting</div>
+    <a href="#subq">Subqueries</a>
+    <a href="#cte">WITH (CTEs)</a>
+    <div class="grp">Changing data</div>
+    <a href="#modify">INSERT, UPDATE, DELETE</a>
+  </nav>
+  <div class="scrim" id="scrim"></div>
+
+  <main id="main">
+    <!-- HOME -->
+    <section id="v-home" class="view home" data-keys="overview home start">
+      <header>
+        <p class="eyebrow">IS 402 · PostgreSQL 18</p>
+        <h1>SQL Handbook</h1>
+        <p class="use">Every schema and SQL tool for the semester. Pick a topic, or search for a task, an error, or a column name.</p>
+      </header>
+      <div class="quick">
+        <a href="#tasks"><b>I want to…</b><span>Task → syntax</span></a>
+        <a href="#errors"><b>Fix an error</b><span>Messages decoded</span></a>
+        <a href="#rowcount"><b>Wrong row count</b><span>Too many, too few</span></a>
+        <a href="#schemas"><b>Schemas</b><span>Tables, keys, joins</span></a>
+      </div>
+      <div class="groups" id="groups"></div>
+      <p class="hint">Press <kbd>/</kbd> anywhere to search.</p>
+    </section>
+
+    <!-- SCHEMAS -->
+    <section id="v-schemas" class="view" hidden data-keys="tables columns keys primary foreign join path diagram erd modify example ztbl driver">
+      <header><p class="eyebrow">Start</p><h2>Schemas</h2>
+        <p class="use"><b>Use it when</b> you need a table's columns, its keys, or the <code>ON</code> condition that joins two tables.</p></header>
+      <div class="sch-bar">
+        <label class="sr" for="sch">Schema</label>
+        <select id="sch"></select>
+        <div class="seg" role="tablist" aria-label="View">
+          <button type="button" role="tab" id="seg-tables" aria-selected="true">Tables</button>
+          <button type="button" role="tab" id="seg-joins" aria-selected="false">Joins</button>
+        </div>
+        <span class="sch-meta" id="sch-meta"></span>
+      </div>
+      <div id="schema-view"></div>
+      <p class="legend"><span><span class="tag pk">PK</span> primary key</span><span><span class="tag fk">FK</span> points to another table (hover for target)</span><span>Faded = audit column</span></p>
+      <div class="note"><b>Example vs. Modify.</b> Use <b>…Example</b> schemas for SELECT work; <b>…Modify</b> copies are for INSERT/UPDATE/DELETE. <b>ztbl</b> tables are driver tables (Ch. 20): helper data used with range or cross joins.</div>
+    </section>
+
+    <!-- TASKS -->
+    <section id="v-tasks" class="view" hidden data-keys="how do i want to task lookup">
+      <header><p class="eyebrow">Quick help</p><h2>I want to…</h2>
+        <p class="use">Find the task, copy the shape, then open the topic for how it works.</p></header>
+      <input class="filter" type="search" id="task-filter" placeholder="Filter tasks" aria-label="Filter tasks">
+      <div class="tasklist" id="task-list"></div>
+    </section>
+
+    <!-- ERRORS -->
+    <section id="v-errors" class="view" hidden data-keys="error message fix debug">
+      <header><p class="eyebrow">Quick help</p><h2>Error messages</h2>
+        <p class="use">Match the first line of the red message. The <code>^</code> marks where Postgres gave up; the real mistake is often just before it.</p></header>
+      <input class="filter" type="search" id="err-filter" placeholder="Filter errors" aria-label="Filter errors">
+      <div class="errlist" id="err-list"></div>
+    </section>
+
+    <section id="v-setup" class="view" hidden data-keys="pgadmin query tool connect search_path schema reset reload f5 run submit file canvas semicolon views textbook">
+      <header><p class="eyebrow">Start</p><h2>Setup &amp; workflow</h2>
+        <p class="use"><b>Use it when</b> you start a session or a new assignment.</p></header>
+      <ol class="steps">
+        <li><b>Open the right database.</b> Right-click <b>IS402Databases → Query Tool</b>. The bar at the top must read <code>IS402Databases/…</code>, not <code>postgres/…</code>.</li>
+        <li><b>Point at a schema.</b> Either set it once per tab, or prefix every table. The prefix always works; the SET resets if the tab reconnects.
+          <div class="code"><pre><code>SET search_path TO SalesOrdersExample;   -- then: FROM Orders
+SELECT * FROM SalesOrdersExample.Orders;  -- or prefix every table</code></pre></div></li>
+        <li><b>Look before you filter.</b> <code>SELECT * FROM Orders LIMIT 10;</code> shows real values, spelling and capitalization.</li>
+        <li><b>Run.</b> F5 runs the whole editor. Highlight one query first to run just that one. The row count shows under Data Output.</li>
+        <li><b>Submit.</b> One query under each <code>-- Q#:</code> line, each ending in <code>;</code>. Put any <code>SET search_path</code> above Q1. Run the whole file once before uploading.</li>
+      </ol>
+      <div class="tw"><table>
+        <thead><tr><th>Need</th><th>Command</th></tr></thead>
+        <tbody>
+          <tr><td>Which schema am I in?</td><td><code>SHOW search_path;</code></td></tr>
+          <tr><td>Which database am I in?</td><td><code>SELECT current_database();</code></td></tr>
+          <tr><td>Comment</td><td><code>-- one line</code> &nbsp; <code>/* several lines */</code></td></tr>
+          <tr><td>Reset all 9 textbook schemas</td><td>Re-run <code>LoadAllTextbookDatabases.sql</code> (undoes every change)</td></tr>
+          <tr><td>Reset the student schema</td><td><code>DROP SCHEMA student CASCADE;</code> then re-run <code>CreateStudentSchemaPostgreSQL.sql</code></td></tr>
+        </tbody>
+      </table></div>
+      <div class="two">
+        <div class="note"><b>Capitalization.</b> Keywords and table/column names ignore case. Text inside single quotes is data and must match exactly: <code>'Seattle'</code> ≠ <code>'seattle'</code>.</div>
+        <div class="note"><b>Quotes.</b> <code>'single'</code> = a text value. <code>"double"</code> = a column or table name. Numbers take no quotes.</div>
+      </div>
+      <div class="note"><b>Textbook views.</b> Each Example schema has a Views folder with names like <code>CH08_…</code>: the book's worked examples by chapter. Right-click one → <b>Scripts → CREATE Script</b> to read its SQL.</div>
+    </section>
+    <section id="v-order" class="view" hidden data-keys="execution order logical processing clauses alias where having why">
+      <header><p class="eyebrow">Start</p><h2>How a query runs</h2>
+        <p class="use"><b>Use it when</b> a query errors for a reason that seems unfair, like an alias "not existing."</p></header>
+      <div class="how"><b>How it works</b>
+        <p>You write <code>SELECT</code> first, but Postgres runs the clauses in this order. Each step only sees what earlier steps produced.</p>
+      </div>
+      <ol class="flow">
+        <li>FROM / JOIN <small>build rows</small></li>
+        <li>WHERE <small>drop rows</small></li>
+        <li>GROUP BY <small>make groups</small></li>
+        <li>HAVING <small>drop groups</small></li>
+        <li>SELECT <small>compute columns, aliases</small></li>
+        <li>DISTINCT <small>drop duplicates</small></li>
+        <li>ORDER BY <small>sort</small></li>
+        <li>LIMIT <small>cut</small></li>
+      </ol>
+      <div class="tw"><table>
+        <thead><tr><th>Because of this order…</th><th>So</th></tr></thead>
+        <tbody>
+          <tr><td>Aliases are created in SELECT (step 5)</td><td>You can't use them in WHERE or HAVING. You can in ORDER BY.</td></tr>
+          <tr><td>Groups don't exist yet in WHERE (step 2)</td><td>Totals like <code>COUNT(*) &gt; 3</code> go in HAVING.</td></tr>
+          <tr><td>Window functions run in SELECT</td><td>Filter on them from an outer query or CTE.</td></tr>
+          <tr><td>Written order is fixed</td><td>Always write SELECT → FROM → JOIN → WHERE → GROUP BY → HAVING → ORDER BY → LIMIT.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+    <section id="v-select" class="view" hidden data-keys="select columns star alias as distinct order by sort asc desc limit offset top nulls last">
+      <header><p class="eyebrow">Reading data</p><h2>SELECT &amp; sorting</h2>
+        <p class="use"><b>Use it when</b> choosing columns, naming them, sorting, removing duplicates, or keeping the first few rows.</p></header>
+      <div class="how"><b>How it works</b>
+        <p><code>SELECT</code> lists what each output row shows; <code>FROM</code> says where rows come from. Without <code>ORDER BY</code>, row order is not guaranteed. <code>DISTINCT</code> removes rows that are identical across <em>every</em> selected column.</p>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th>Need</th><th>Syntax</th></tr></thead>
+        <tbody>
+          <tr><td>All columns</td><td><code>SELECT *</code></td></tr>
+          <tr><td>Rename a column</td><td><code>RetailPrice AS price</code></td></tr>
+          <tr><td>Sort / reverse</td><td><code>ORDER BY col</code> &nbsp; <code>ORDER BY col DESC</code></td></tr>
+          <tr><td>Tie-breaker</td><td><code>ORDER BY last_name, first_name</code></td></tr>
+          <tr><td>Mixed directions</td><td><code>ORDER BY state, price DESC</code></td></tr>
+          <tr><td>Sort by alias or position</td><td><code>ORDER BY price</code> &nbsp; <code>ORDER BY 2</code></td></tr>
+          <tr><td>Control NULL placement</td><td><code>ORDER BY col NULLS FIRST</code> / <code>NULLS LAST</code></td></tr>
+          <tr><td>Unique rows</td><td><code>SELECT DISTINCT city, state</code></td></tr>
+          <tr><td>First N rows</td><td><code>ORDER BY … LIMIT 5</code></td></tr>
+          <tr><td>Skip rows</td><td><code>LIMIT 5 OFFSET 10</code></td></tr>
+        </tbody>
+      </table></div>
+      <div class="code"><p class="cap">Five most expensive products; ties broken by name</p><pre><code>SELECT ProductName, RetailPrice AS price
+FROM SalesOrdersExample.Products
+ORDER BY RetailPrice DESC, ProductName
+LIMIT 5;</code></pre></div>
+      <div class="traps"><b>Traps</b><ul>
+        <li><code>DISTINCT</code> works on the whole row. <code>SELECT DISTINCT city, state</code> keeps each city/state pair once.</li>
+        <li><code>LIMIT</code> without <code>ORDER BY</code> returns arbitrary rows.</li>
+        <li>Aliases come out lowercase unless double-quoted: <code>AS "Price"</code>.</li>
+      </ul></div>
+    </section>
+    <section id="v-expr" class="view" hidden data-keys="math arithmetic calculate computed column multiply divide integer division round cast numeric modulo percent coalesce nullif">
+      <header><p class="eyebrow">Reading data</p><h2>Math &amp; expressions</h2>
+        <p class="use"><b>Use it when</b> a column you need isn't stored: totals, percentages, rounded values, conversions.</p></header>
+      <div class="how"><b>How it works</b>
+        <p>Any SELECT item can be a formula. Postgres computes it once per row. The result's type follows the inputs: integer ÷ integer stays an integer and drops the decimal.</p>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th>Need</th><th>Syntax</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td>Arithmetic</td><td><code>price * qty</code> &nbsp; <code>+ - * /</code></td><td></td></tr>
+          <tr><td>Remainder (odd/even)</td><td><code>7 % 2</code></td><td><code>1</code> → odd</td></tr>
+          <tr><td>Integer division</td><td><code>7 / 2</code></td><td><code>3</code></td></tr>
+          <tr><td>Keep decimals</td><td><code>7 / 2.0</code> &nbsp; <code>7::numeric / 2</code></td><td><code>3.5</code></td></tr>
+          <tr><td>Round</td><td><code>ROUND(x, 2)</code></td><td>2 decimals</td></tr>
+          <tr><td>Round up / down</td><td><code>CEIL(x)</code> &nbsp; <code>FLOOR(x)</code></td><td></td></tr>
+          <tr><td>Convert type</td><td><code>CAST(x AS numeric)</code> &nbsp; <code>x::integer</code></td><td></td></tr>
+          <tr><td>Absolute value</td><td><code>ABS(x)</code></td><td></td></tr>
+          <tr><td>Avoid ÷ 0</td><td><code>x / NULLIF(y, 0)</code></td><td>NULL instead of error</td></tr>
+          <tr><td>Percent</td><td><code>ROUND(100.0 * part / whole, 1)</code></td><td></td></tr>
+        </tbody>
+      </table></div>
+      <div class="code"><p class="cap">Line totals for one order</p><pre><code>SELECT OrderNumber, ProductNumber,
+       QuotedPrice * QuantityOrdered AS line_total
+FROM SalesOrdersExample.Order_Details
+WHERE OrderNumber = 1;</code></pre></div>
+      <div class="traps"><b>Traps</b><ul>
+        <li><code>ROUND(col, 2)</code> on a <code>real</code>/<code>float</code> column errors. Use <code>ROUND(col::numeric, 2)</code>.</li>
+        <li>Any math with NULL returns NULL. Wrap it: <code>COALESCE(col, 0)</code>.</li>
+        <li>You can't reuse an alias in the same SELECT or in WHERE. Repeat the formula.</li>
+      </ul></div>
+    </section>
+    <section id="v-where" class="view" hidden data-keys="where filter condition equals in between like ilike wildcard percent underscore and or not parentheses range letters starts with contains">
+      <header><p class="eyebrow">Reading data</p><h2>Filtering with WHERE</h2>
+        <p class="use"><b>Use it when</b> you only want some rows.</p></header>
+      <div class="how"><b>How it works</b>
+        <p>WHERE tests every row and keeps it only if the condition is <em>true</em>. False and unknown (NULL) both drop the row.</p>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th>Need</th><th>Syntax</th></tr></thead>
+        <tbody>
+          <tr><td>Equal / not equal</td><td><code>= 'Seattle'</code> &nbsp; <code>&lt;&gt; 'WA'</code></td></tr>
+          <tr><td>Compare</td><td><code>&gt;</code> <code>&gt;=</code> <code>&lt;</code> <code>&lt;=</code></td></tr>
+          <tr><td>In a list</td><td><code>IN ('WA', 'OR')</code> &nbsp; <code>NOT IN (…)</code></td></tr>
+          <tr><td>Range (both ends included)</td><td><code>BETWEEN 100 AND 199</code></td></tr>
+          <tr><td>Starts with / ends with / contains</td><td><code>LIKE 'A%'</code> &nbsp; <code>'%son'</code> &nbsp; <code>'%bike%'</code></td></tr>
+          <tr><td>Exactly one character</td><td><code>LIKE '_a%'</code> <span class="c">(2nd letter is a)</span></td></tr>
+          <tr><td>Ignore case</td><td><code>ILIKE 'a%'</code></td></tr>
+          <tr><td>Opposite</td><td><code>NOT LIKE</code> &nbsp; <code>NOT BETWEEN</code> &nbsp; <code>NOT (…)</code></td></tr>
+          <tr><td>Letter range (A–C)</td><td><code>BETWEEN 'A' AND 'D'</code> <span class="c">(end at the next letter)</span></td></tr>
+        </tbody>
+      </table></div>
+      <p><b>AND runs before OR.</b> Wrap OR choices in parentheses: <code>WHERE state = 'WA' AND (city = 'Seattle' OR city = 'Bellevue')</code>.</p>
+      <div class="code"><p class="cap">Entertainers in two cities whose names start with J</p><pre><code>SELECT EntStageName, EntCity
+FROM EntertainmentAgencyExample.Entertainers
+WHERE EntCity IN ('Seattle', 'Bellevue')
+  AND EntStageName LIKE 'J%';</code></pre></div>
+      <div class="traps"><b>Traps</b><ul>
+        <li><code>LIKE</code> only works on text. For number ranges use <code>BETWEEN</code> or <code>&gt;=</code>/<code>&lt;</code>.</li>
+        <li><code>%</code> is a wildcard only inside LIKE. <code>BETWEEN 'S%' …</code> treats it as a literal.</li>
+        <li>Text compares in dictionary order: <code>'Smith' &gt; 'S'</code>, so <code>BETWEEN 'S' AND 'W'</code> misses "Wilson".</li>
+        <li>Quote text and dates; don't quote numbers.</li>
+      </ul></div>
+    </section>
+    <section id="v-null" class="view" hidden data-keys="null is null is not null blank empty missing not entered coalesce nullif empty string unknown not in">
+      <header><p class="eyebrow">Reading data</p><h2>NULL &amp; blanks</h2>
+        <p class="use"><b>Use it when</b> looking for missing values, or when results seem to skip rows.</p></header>
+      <div class="how"><b>How it works</b>
+        <p>NULL means "no value." It isn't 0 or blank text. Any comparison with NULL is <em>unknown</em>, so <code>= NULL</code> never matches. Only <code>IS NULL</code> / <code>IS NOT NULL</code> test it.</p>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th>Need</th><th>Syntax</th></tr></thead>
+        <tbody>
+          <tr><td>Has no value</td><td><code>col IS NULL</code></td></tr>
+          <tr><td>Has a value</td><td><code>col IS NOT NULL</code></td></tr>
+          <tr><td>Empty text (not NULL)</td><td><code>col = ''</code></td></tr>
+          <tr><td>Missing either way</td><td><code>col IS NULL OR col = ''</code></td></tr>
+          <tr><td>Replace NULL</td><td><code>COALESCE(col, 'none')</code></td></tr>
+          <tr><td>Turn a value into NULL</td><td><code>NULLIF(col, '')</code></td></tr>
+          <tr><td>NULL-safe comparison</td><td><code>a IS DISTINCT FROM b</code></td></tr>
+        </tbody>
+      </table></div>
+      <div class="code"><p class="cap">Entertainers with no web page</p><pre><code>SELECT EntStageName
+FROM EntertainmentAgencyExample.Entertainers
+WHERE EntWebPage IS NULL;</code></pre></div>
+      <div class="traps"><b>Traps</b><ul>
+        <li>Some "not entered" values are stored as <code>''</code>. If <code>IS NULL</code> finds too few rows, check <code>= ''</code> too.</li>
+        <li><code>NOT IN (subquery)</code> returns nothing if the subquery has a NULL. Use <code>NOT EXISTS</code>.</li>
+        <li><code>'a' || NULL</code> is NULL. <code>CONCAT()</code> skips NULLs instead.</li>
+        <li><code>COUNT(col)</code>, <code>SUM</code>, <code>AVG</code> ignore NULLs; <code>COUNT(*)</code> doesn't. <code>DISTINCT</code> keeps one NULL as its own value.</li>
+      </ul></div>
+    </section>
+    <section id="v-text" class="view" hidden data-keys="text string concatenate || full name upper lower initcap length left right substring position trim replace lpad split_part concat cast apostrophe">
+      <header><p class="eyebrow">Reading data</p><h2>Text</h2>
+        <p class="use"><b>Use it when</b> combining, reformatting, or pulling pieces out of text columns.</p></header>
+      <div class="how"><b>How it works</b>
+        <p>Text functions run once per row and return new text. Positions count from 1. The result of SUBSTRING or LEFT is still text, even if it looks like a number.</p>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th>Function</th><th>Example</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td>Join</td><td><code>first || ' ' || last</code></td><td><code>Ann Lee</code></td></tr>
+          <tr><td>Join, skip NULLs</td><td><code>CONCAT_WS(' ', first, middle, last)</code></td><td></td></tr>
+          <tr><td>Case</td><td><code>UPPER('Lee')</code> · <code>LOWER</code> · <code>INITCAP('mARY ann')</code></td><td><code>LEE</code> · · <code>Mary Ann</code></td></tr>
+          <tr><td>Length</td><td><code>LENGTH('Lee')</code></td><td><code>3</code></td></tr>
+          <tr><td>From the left / right</td><td><code>LEFT('Seattle', 3)</code> · <code>RIGHT('206-555-1234', 4)</code></td><td><code>Sea</code> · <code>1234</code></td></tr>
+          <tr><td>Middle</td><td><code>SUBSTRING('206-555-1234' FROM 5 FOR 3)</code></td><td><code>555</code></td></tr>
+          <tr><td>Everything after position n</td><td><code>SUBSTRING('H310' FROM 2)</code></td><td><code>310</code></td></tr>
+          <tr><td>Find a character</td><td><code>POSITION('-' IN '206-555')</code></td><td><code>4</code></td></tr>
+          <tr><td>Split on a character</td><td><code>SPLIT_PART('Bellevue, WA', ',', 1)</code></td><td><code>Bellevue</code></td></tr>
+          <tr><td>Replace</td><td><code>REPLACE('206-555', '-', '')</code></td><td><code>206555</code></td></tr>
+          <tr><td>Trim spaces</td><td><code>TRIM('  hi  ')</code></td><td><code>hi</code></td></tr>
+          <tr><td>Pad</td><td><code>LPAD('7', 3, '0')</code></td><td><code>007</code></td></tr>
+          <tr><td>Text ↔ number</td><td><code>'310'::integer</code> · <code>course_no::text</code></td><td></td></tr>
+          <tr><td>Apostrophe in text</td><td><code>'O''Brien'</code></td><td><code>O'Brien</code></td></tr>
+        </tbody>
+      </table></div>
+      <div class="code"><p class="cap">Full name in one column</p><pre><code>SELECT StfFirstName || ' ' || StfLastname AS full_name,
+       LENGTH(StfLastname) AS letters
+FROM SchoolSchedulingExample.Staff
+ORDER BY StfLastname, StfFirstName;</code></pre></div>
+      <div class="traps"><b>Traps</b><ul>
+        <li><code>||</code> with a NULL column makes the whole result NULL. Use <code>CONCAT</code> or <code>COALESCE</code>.</li>
+        <li>Comparisons are case-sensitive. Use <code>ILIKE</code> or <code>UPPER(col) = 'SMITH'</code>.</li>
+        <li>Cast before math: <code>CAST(SUBSTRING(loc FROM 2) AS integer) % 2</code>.</li>
+        <li>Sort by the real columns, not the combined string, when the order should be last name then first.</li>
+      </ul></div>
+    </section>
+    <section id="v-dates" class="view" hidden data-keys="date time timestamp interval current_date now age extract date_trunc to_char month year day between days years ago noon format">
+      <header><p class="eyebrow">Reading data</p><h2>Dates &amp; times</h2>
+        <p class="use"><b>Use it when</b> filtering by day or month, adding time, measuring gaps, or formatting dates.</p></header>
+      <div class="how"><b>How it works</b>
+        <p>Three types: <code>date</code> (2017-09-02), <code>time</code> (13:00:00), <code>timestamp</code> (both). Write literals as quoted text <code>'YYYY-MM-DD'</code>. Math rules: <b>date ± integer = date</b>; <b>date − date = days (integer)</b>; <b>timestamp ± interval = timestamp</b>; <b>timestamp − timestamp = interval</b>.</p>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th>Need</th><th>Syntax</th></tr></thead>
+        <tbody>
+          <tr><td>Today / now</td><td><code>CURRENT_DATE</code> &nbsp; <code>NOW()</code></td></tr>
+          <tr><td>Drop the time / keep only the time</td><td><code>col::date</code> &nbsp; <code>col::time</code></td></tr>
+          <tr><td>One day (timestamp column)</td><td><code>col::date = '2017-10-01'</code></td></tr>
+          <tr><td>One month</td><td><code>col &gt;= '2017-10-01' AND col &lt; '2017-11-01'</code></td></tr>
+          <tr><td>After a moment</td><td><code>col &gt; '2017-10-01 14:30'</code></td></tr>
+          <tr><td>Add time</td><td><code>d + 30</code> (date) &nbsp; <code>ts + INTERVAL '90 days'</code> &nbsp; <code>'2 hours'</code> <code>'1 month'</code></td></tr>
+          <tr><td>Days between</td><td><code>end_date - start_date</code></td></tr>
+          <tr><td>Time between (readable)</td><td><code>AGE(CURRENT_DATE, d)</code> → <code>29 years 4 mons…</code></td></tr>
+          <tr><td>Whole years</td><td><code>EXTRACT(YEAR FROM AGE(CURRENT_DATE, d))</code></td></tr>
+          <tr><td>Decimal years</td><td><code>ROUND((CURRENT_DATE - d) / 365.25, 2)</code></td></tr>
+          <tr><td>Part of a date</td><td><code>EXTRACT(YEAR | MONTH | DAY | DOW | HOUR FROM d)</code></td></tr>
+          <tr><td>First of the month</td><td><code>DATE_TRUNC('month', d)::date</code></td></tr>
+          <tr><td>Format</td><td><code>TO_CHAR(d, 'Mon DD, YYYY')</code> → <code>Sep 02, 2017</code></td></tr>
+        </tbody>
+      </table></div>
+      <p class="c" style="font-style:normal">TO_CHAR codes: <code>YYYY</code> <code>MM</code> <code>Mon</code> <code>Month</code> <code>DD</code> <code>Day</code> <code>HH24</code> <code>HH12</code> <code>MI</code> <code>AM</code></p>
+      <div class="code"><p class="cap">October 2017 bookings and how many days each ran</p><pre><code>SELECT EngagementNumber, StartDate, EndDate,
+       EndDate - StartDate + 1 AS days_booked
+FROM EntertainmentAgencyExample.Engagements
+WHERE StartDate &gt;= '2017-10-01' AND StartDate &lt; '2017-11-01'
+ORDER BY StartDate;</code></pre></div>
+      <div class="traps"><b>Traps</b><ul>
+        <li>A timestamp at noon never equals a plain date (that means midnight). Compare with <code>::date</code>.</li>
+        <li><code>BETWEEN '…-01' AND '…-31'</code> on a timestamp misses everything after midnight on the 31st.</li>
+        <li><code>date + INTERVAL</code> turns into a timestamp. Add <code>::date</code> if you want a date back.</li>
+        <li><code>EXTRACT(DOW …)</code>: 0 = Sunday. "As of today" answers change daily.</li>
+      </ul></div>
+    </section>
+    <section id="v-case" class="view" hidden data-keys="case when then else end if conditional label category translate codes">
+      <header><p class="eyebrow">Reading data</p><h2>CASE</h2>
+        <p class="use"><b>Use it when</b> a column depends on a condition, or you need a value the table doesn't store (labels, full names for codes, custom sort order).</p></header>
+      <div class="how"><b>How it works</b>
+        <p>CASE checks its <code>WHEN</code> lines top to bottom for each row and returns the first matching <code>THEN</code>. No match → <code>ELSE</code>, or NULL if there's no ELSE.</p>
+      </div>
+      <div class="two">
+        <div class="code"><p class="cap">Condition form: any comparison</p><pre><code>CASE WHEN RetailPrice &gt;= 1000 THEN 'Premium'
+     WHEN RetailPrice &gt;= 100  THEN 'Standard'
+     ELSE 'Budget'
+END AS price_tier</code></pre></div>
+        <div class="code"><p class="cap">Value form: equals only</p><pre><code>CASE Gender
+  WHEN 'M' THEN 'Male'
+  WHEN 'F' THEN 'Female'
+  ELSE 'Unknown'
+END AS gender_name</code></pre></div>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th>Also works in</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>ORDER BY (custom order)</td><td class="wrap"><code>ORDER BY CASE state WHEN 'WA' THEN 1 ELSE 2 END, city</code></td></tr>
+          <tr><td>Inside an aggregate</td><td class="wrap"><code>SUM(CASE WHEN RetailPrice &gt; 500 THEN 1 ELSE 0 END)</code></td></tr>
+          <tr><td>WHERE</td><td class="wrap">Works, but plain AND/OR is usually clearer</td></tr>
+        </tbody>
+      </table></div>
+      <div class="traps"><b>Traps</b><ul>
+        <li>The value form can't do <code>&lt;</code> or <code>&gt;=</code>. <code>CASE score WHEN &lt; 85</code> is a syntax error.</li>
+        <li>First match wins, so order conditions from most to least specific.</li>
+        <li>Every THEN must return the same kind of value (all text or all numbers). Always close with <code>END</code>.</li>
+      </ul></div>
+    </section>
+    <section id="v-joins" class="view" hidden data-keys="join inner join on alias bridge many to many two tables combine key foreign primary composite using where join comma">
+      <header><p class="eyebrow">Combining tables</p><h2>Inner joins</h2>
+        <p class="use"><b>Use it when</b> the columns you need live in more than one table.</p></header>
+      <div class="how"><b>How it works</b>
+        <p>A join pairs rows from two tables wherever the <code>ON</code> condition is true, usually <em>foreign key = primary key</em>. An inner join keeps matched pairs only. A row with three matches appears three times.</p>
+      </div>
+      <h3>Which rows each join keeps</h3>
+      <p class="c" style="font-style:normal">Table A has keys 1, 2, 3. Table B has keys 2, 3, 4.</p>
+      <div class="tw"><table class="jdemo">
+        <thead><tr><th>Join</th><th>Keys in the result</th></tr></thead>
+        <tbody>
+          <tr><td>A JOIN B</td><td><span class="pill">2</span><span class="pill">3</span></td></tr>
+          <tr><td>A LEFT JOIN B</td><td><span class="pill">1</span><span class="pill">2</span><span class="pill">3</span> <span class="c">· 1 has NULLs for B</span></td></tr>
+          <tr><td>A RIGHT JOIN B</td><td><span class="pill">2</span><span class="pill">3</span><span class="pill">4</span> <span class="c">· 4 has NULLs for A</span></td></tr>
+          <tr><td>A FULL JOIN B</td><td><span class="pill">1</span><span class="pill">2</span><span class="pill">3</span><span class="pill">4</span></td></tr>
+          <tr><td>A CROSS JOIN B</td><td><span class="pill n">3 × 3 = 9 pairs</span> <span class="c">· no ON</span></td></tr>
+        </tbody>
+      </table></div>
+      <h3>Building a join</h3>
+      <ol class="steps">
+        <li>List the columns the question wants.</li>
+        <li>Find the tables that hold them (search bar or the Schemas page).</li>
+        <li>Find the path between them in that schema's join list. Bridge tables sit in the middle.</li>
+        <li>Add one <code>JOIN … ON</code> per table, each linking to a table already in the query.</li>
+        <li>Add WHERE, then check the row count.</li>
+      </ol>
+      <div class="tw"><table>
+        <thead><tr><th>Need</th><th>Syntax</th></tr></thead>
+        <tbody>
+          <tr><td>Basic</td><td><code>FROM a JOIN b ON a.key = b.key</code></td></tr>
+          <tr><td>Aliases</td><td><code>FROM Orders AS o JOIN Customers c ON …</code></td></tr>
+          <tr><td>Two-column key</td><td><code>ON a.MatchID = b.MatchID AND a.GameNumber = b.GameNumber</code></td></tr>
+          <tr><td>Same column name both sides</td><td><code>JOIN b USING (CustomerID)</code></td></tr>
+          <tr><td>WHERE-style (older)</td><td><code>FROM a, b WHERE a.key = b.key</code></td></tr>
+        </tbody>
+      </table></div>
+      <div class="code"><p class="cap">Through a bridge table: entertainers and their styles</p><pre><code>SELECT e.EntStageName, ms.StyleName
+FROM EntertainmentAgencyExample.Entertainers AS e
+JOIN EntertainmentAgencyExample.Entertainer_Styles AS es
+  ON e.EntertainerID = es.EntertainerID
+JOIN EntertainmentAgencyExample.Musical_Styles AS ms
+  ON es.StyleID = ms.StyleID
+ORDER BY e.EntStageName;</code></pre></div>
+      <div class="traps"><b>Traps</b><ul>
+        <li>A comma join with no matching condition pairs <em>every</em> row with every row. Huge row count = missing ON/WHERE match.</li>
+        <li>Composite keys need every part in the ON, or rows multiply.</li>
+        <li>A column in both tables must be prefixed: <code>c.CustomerID</code>. Once a table has an alias, use the alias everywhere.</li>
+        <li>Skip joins you don't need: if one table has every column, use just that table.</li>
+      </ul></div>
+    </section>
+    <section id="v-outer" class="view" hidden data-keys="left join right join full outer join keep all every include no match missing never zero anti join is null on vs where">
+      <header><p class="eyebrow">Combining tables</p><h2>Outer joins</h2>
+        <p class="use"><b>Use it when</b> the question says <b>every / all / including those with none</b>, or asks for rows that <b>never</b> matched.</p></header>
+      <div class="how"><b>How it works</b>
+        <p><code>LEFT JOIN</code> keeps every row from the table in <code>FROM</code> (the left side). Where nothing matches, the right side's columns are NULL. <code>RIGHT JOIN</code> is the mirror image; <code>FULL JOIN</code> keeps unmatched rows from both.</p>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th>Need</th><th>Pattern</th></tr></thead>
+        <tbody>
+          <tr><td>Keep all rows of A</td><td><code>FROM a LEFT JOIN b ON …</code></td></tr>
+          <tr><td>Rows in A with <b>no</b> match</td><td><code>LEFT JOIN b ON … WHERE b.key IS NULL</code></td></tr>
+          <tr><td>Count per row, showing zeros</td><td><code>LEFT JOIN b … COUNT(b.key) … GROUP BY</code></td></tr>
+          <tr><td>Filter B but keep all of A</td><td>Put the filter in <code>ON</code>, not WHERE (below)</td></tr>
+        </tbody>
+      </table></div>
+      <div class="code"><p class="cap">Ingredients no recipe uses</p><pre><code>SELECT i.IngredientName
+FROM RecipesExample.Ingredients AS i
+LEFT JOIN RecipesExample.Recipe_Ingredients AS ri
+  ON i.IngredientID = ri.IngredientID
+WHERE ri.RecipeID IS NULL;</code></pre></div>
+      <h3>ON vs. WHERE with outer joins</h3>
+      <div class="two">
+        <div class="code"><p class="cap">✓ All agents, plus only their 2018 bookings</p><pre><code>FROM Agents a
+LEFT JOIN Engagements e
+  ON a.AgentID = e.AgentID
+ AND e.StartDate &gt;= '2018-01-01'</code></pre></div>
+        <div class="code"><p class="cap">✗ Agents with no 2018 booking disappear</p><pre><code>FROM Agents a
+LEFT JOIN Engagements e
+  ON a.AgentID = e.AgentID
+WHERE e.StartDate &gt;= '2018-01-01'</code></pre></div>
+      </div>
+      <p>WHERE runs after the join. Unmatched rows have NULL there, NULL fails the test, and the LEFT JOIN quietly becomes an inner join.</p>
+      <div class="traps"><b>Traps</b><ul>
+        <li>Table order matters: the table you need all of goes in <code>FROM</code>.</li>
+        <li>In a chain, keep every later join <code>LEFT</code> too, or the NULL rows get dropped.</li>
+        <li><code>COUNT(*)</code> counts an unmatched row as 1. Use <code>COUNT(b.key)</code> to get 0.</li>
+        <li>For "no match," test a column that can't be NULL in a real match (the key).</li>
+      </ul></div>
+    </section>
+    <section id="v-morejoins" class="view" hidden data-keys="self join same table twice alias cross join cartesian every combination range join between driver ztbl non equi prerequisite">
+      <header><p class="eyebrow">Combining tables</p><h2>Self, cross &amp; range joins</h2>
+        <p class="use"><b>Use it when</b> a table points to itself, you need one table twice, every combination, or a value matched to a range.</p></header>
+      <div class="how"><b>How it works</b>
+        <p>A join can use the same table twice if each copy has its own alias. The ON can be any true/false test, not only <code>=</code>. <code>CROSS JOIN</code> has no ON and returns every pair.</p>
+      </div>
+      <div class="code"><p class="cap">Self join: each subject with its prerequisite's name</p><pre><code>SELECT s.SubjectCode, s.SubjectName,
+       p.SubjectName AS prereq_name
+FROM SchoolSchedulingExample.Subjects AS s   -- the subject
+JOIN SchoolSchedulingExample.Subjects AS p   -- its prerequisite
+  ON s.SubjectPreReq = p.SubjectCode;</code></pre></div>
+      <div class="code"><p class="cap">Same lookup table twice: both teams in a match</p><pre><code>SELECT tm.MatchID, odd.TeamName AS odd_lane, even.TeamName AS even_lane
+FROM BowlingLeagueExample.Tourney_Matches AS tm
+JOIN BowlingLeagueExample.Teams AS odd  ON tm.OddLaneTeamID  = odd.TeamID
+JOIN BowlingLeagueExample.Teams AS even ON tm.EvenLaneTeamID = even.TeamID;</code></pre></div>
+      <div class="code"><p class="cap">Range join with a driver table</p><pre><code>SELECT p.ProductName, p.RetailPrice, r.PriceCategory
+FROM SalesOrdersExample.Products AS p
+JOIN SalesOrdersExample.ztblPriceRanges AS r
+  ON p.RetailPrice BETWEEN r.LowPrice AND r.HighPrice;</code></pre></div>
+      <div class="traps"><b>Traps</b><ul>
+        <li>A self join without two aliases is ambiguous. Name them for their role (<code>s</code> subject, <code>p</code> prerequisite).</li>
+        <li>CROSS JOIN rows = rows in A × rows in B. Filter afterwards if you only need some pairs.</li>
+      </ul></div>
+    </section>
+    <section id="v-sets" class="view" hidden data-keys="union union all intersect except stack combine lists both difference append">
+      <header><p class="eyebrow">Combining tables</p><h2>UNION, INTERSECT, EXCEPT</h2>
+        <p class="use"><b>Use it when</b> you want to stack two result lists, or find what's in both or only one.</p></header>
+      <div class="how"><b>How it works</b>
+        <p>Joins add columns side by side; set operations add rows top to bottom. Each SELECT must return the same number of columns with matching types. Column names come from the first SELECT.</p>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th>Operator</th><th>Returns</th></tr></thead>
+        <tbody>
+          <tr><td><code>UNION</code></td><td>Rows from either query, duplicates removed</td></tr>
+          <tr><td><code>UNION ALL</code></td><td>Rows from either query, duplicates kept (faster)</td></tr>
+          <tr><td><code>INTERSECT</code></td><td>Rows in both</td></tr>
+          <tr><td><code>EXCEPT</code></td><td>Rows in the first but not the second</td></tr>
+        </tbody>
+      </table></div>
+      <div class="code"><p class="cap">Every city that has a customer or a vendor</p><pre><code>SELECT CustCity AS city FROM SalesOrdersExample.Customers
+UNION
+SELECT VendCity FROM SalesOrdersExample.Vendors
+ORDER BY city;</code></pre></div>
+      <div class="traps"><b>Traps</b><ul>
+        <li>One <code>ORDER BY</code>, at the very end, using the first query's column names.</li>
+        <li>Fewer rows than expected? <code>UNION</code> removed duplicates. Use <code>UNION ALL</code>.</li>
+        <li>Add a label column to see where each row came from: <code>SELECT 'Customer' AS source, …</code>.</li>
+      </ul></div>
+    </section>
+    <section id="v-agg" class="view" hidden data-keys="aggregate count sum avg average min max group by per each total how many distinct string_agg filter zero conditional count">
+      <header><p class="eyebrow">Summarizing</p><h2>Aggregates &amp; GROUP BY</h2>
+        <p class="use"><b>Use it when</b> the question says <b>how many, total, average, highest, lowest</b>, or <b>per / for each</b>.</p></header>
+      <div class="how"><b>How it works</b>
+        <p>An aggregate collapses many rows into one value. Without GROUP BY, the whole result becomes <b>one row</b>. With <code>GROUP BY col</code>, rows are sorted into buckets by that column and you get <b>one row per bucket</b>, with the aggregate computed inside each.</p>
+        <p><b>The rule:</b> every column in SELECT must be in GROUP BY or inside an aggregate.</p>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th>Need</th><th>Syntax</th></tr></thead>
+        <tbody>
+          <tr><td>Count rows</td><td><code>COUNT(*)</code></td></tr>
+          <tr><td>Count non-NULL values</td><td><code>COUNT(col)</code></td></tr>
+          <tr><td>Count unique values</td><td><code>COUNT(DISTINCT col)</code></td></tr>
+          <tr><td>Total / average</td><td><code>SUM(x)</code> &nbsp; <code>ROUND(AVG(x), 2)</code></td></tr>
+          <tr><td>Smallest / largest</td><td><code>MIN(x)</code> &nbsp; <code>MAX(x)</code> <span class="c">(also dates, text)</span></td></tr>
+          <tr><td>Total of a formula</td><td><code>SUM(QuotedPrice * QuantityOrdered)</code></td></tr>
+          <tr><td>Count only some rows</td><td><code>COUNT(*) FILTER (WHERE x &gt; 500)</code></td></tr>
+          <tr><td>Same, portable</td><td><code>SUM(CASE WHEN x &gt; 500 THEN 1 ELSE 0 END)</code></td></tr>
+          <tr><td>List in one cell</td><td><code>STRING_AGG(col, ', ' ORDER BY col)</code></td></tr>
+          <tr><td>Group by several columns</td><td><code>GROUP BY state, city</code></td></tr>
+        </tbody>
+      </table></div>
+      <div class="code"><p class="cap">Products and average price per category</p><pre><code>SELECT c.CategoryDescription,
+       COUNT(*) AS products,
+       ROUND(AVG(p.RetailPrice), 2) AS avg_price
+FROM SalesOrdersExample.Products AS p
+JOIN SalesOrdersExample.Categories AS c ON p.CategoryID = c.CategoryID
+GROUP BY c.CategoryDescription
+ORDER BY products DESC;</code></pre></div>
+      <div class="code"><p class="cap">Every style, including ones no entertainer plays (count 0)</p><pre><code>SELECT ms.StyleName, COUNT(es.EntertainerID) AS entertainers
+FROM EntertainmentAgencyExample.Musical_Styles AS ms
+LEFT JOIN EntertainmentAgencyExample.Entertainer_Styles AS es
+  ON ms.StyleID = es.StyleID
+GROUP BY ms.StyleName
+ORDER BY entertainers DESC, ms.StyleName;</code></pre></div>
+      <div class="traps"><b>Traps</b><ul>
+        <li>"must appear in the GROUP BY clause" = a plain column in SELECT. Add it to GROUP BY or aggregate it.</li>
+        <li>Grouping by name alone merges two people with the same name. Group by the ID too.</li>
+        <li>An extra column in GROUP BY splits groups further than you meant.</li>
+        <li><code>AVG</code> of whole numbers gives long decimals. Wrap in <code>ROUND(…, 2)</code>.</li>
+      </ul></div>
+    </section>
+    <section id="v-having" class="view" hidden data-keys="having filter groups total more than at least where vs having">
+      <header><p class="eyebrow">Summarizing</p><h2>HAVING</h2>
+        <p class="use"><b>Use it when</b> you filter on a total: "customers with more than 40 orders," "styles played by at least 3 entertainers."</p></header>
+      <div class="how"><b>How it works</b>
+        <p>WHERE filters rows <em>before</em> grouping. HAVING filters groups <em>after</em> the aggregates are computed.</p>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th></th><th>WHERE</th><th>HAVING</th></tr></thead>
+        <tbody>
+          <tr><td>Filters</td><td>Rows</td><td>Groups</td></tr>
+          <tr><td>Runs</td><td>Before GROUP BY</td><td>After GROUP BY</td></tr>
+          <tr><td>Can use aggregates</td><td>No</td><td>Yes</td></tr>
+          <tr><td>Example</td><td><code>WHERE OrderDate &gt;= '2018-01-01'</code></td><td><code>HAVING COUNT(*) &gt; 40</code></td></tr>
+        </tbody>
+      </table></div>
+      <div class="code"><p class="cap">Customers with more than 40 orders</p><pre><code>SELECT CustomerID, COUNT(*) AS orders
+FROM SalesOrdersExample.Orders
+GROUP BY CustomerID
+HAVING COUNT(*) &gt; 40
+ORDER BY orders DESC;</code></pre></div>
+      <div class="traps"><b>Traps</b><ul>
+        <li>Repeat the aggregate in HAVING. The SELECT alias (<code>orders</code>) doesn't exist there yet.</li>
+        <li>Conditions on single rows belong in WHERE, even in a grouped query.</li>
+      </ul></div>
+    </section>
+    <section id="v-window" class="view" hidden data-keys="window over partition by rank dense_rank row_number ntile running total cumulative lag lead top per group">
+      <header><p class="eyebrow">Summarizing</p><h2>Window functions</h2>
+        <p class="use"><b>Use it when</b> you need a rank, a running total, or a group total <em>next to</em> each row.</p></header>
+      <div class="how"><b>How it works</b>
+        <p>Like an aggregate, but rows aren't collapsed. <code>OVER (…)</code> defines the window: <code>PARTITION BY</code> splits rows into groups, <code>ORDER BY</code> sets the order inside each group.</p>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th>Function</th><th>Gives</th></tr></thead>
+        <tbody>
+          <tr><td><code>ROW_NUMBER() OVER (ORDER BY x)</code></td><td>1, 2, 3, 4 (no ties)</td></tr>
+          <tr><td><code>RANK() OVER (ORDER BY x DESC)</code></td><td>1, 2, 2, 4 (ties share, then a gap)</td></tr>
+          <tr><td><code>DENSE_RANK() OVER (…)</code></td><td>1, 2, 2, 3 (no gap)</td></tr>
+          <tr><td><code>NTILE(4) OVER (ORDER BY x)</code></td><td>Quartile 1–4</td></tr>
+          <tr><td><code>SUM(x) OVER (ORDER BY d)</code></td><td>Running total</td></tr>
+          <tr><td><code>AVG(x) OVER (PARTITION BY g)</code></td><td>Group average on every row</td></tr>
+          <tr><td><code>LAG(x) / LEAD(x) OVER (ORDER BY d)</code></td><td>Previous / next row's value</td></tr>
+        </tbody>
+      </table></div>
+      <div class="code"><p class="cap">Place of each bowler within each game</p><pre><code>SELECT BowlerID, MatchID, GameNumber, RawScore,
+       RANK() OVER (PARTITION BY MatchID, GameNumber
+                    ORDER BY RawScore DESC) AS place
+FROM BowlingLeagueExample.Bowler_Scores;</code></pre></div>
+      <div class="traps"><b>Traps</b><ul>
+        <li>You can't filter on a window function in WHERE. For "top 3 per group," compute it in a subquery or CTE, then <code>WHERE place &lt;= 3</code> outside.</li>
+      </ul></div>
+    </section>
+    <section id="v-subq" class="view" hidden data-keys="subquery nested inner query in exists not exists any all above average correlated derived table scalar">
+      <header><p class="eyebrow">Nesting</p><h2>Subqueries</h2>
+        <p class="use"><b>Use it when</b> a filter depends on another query: "above average," "in the list of…," "has at least one…," "never…".</p></header>
+      <div class="how"><b>How it works</b>
+        <p>A query in parentheses inside another query. Where it sits decides what it must return: <b>one value</b> (after <code>=</code> or <code>&gt;</code>, or in SELECT), <b>one column</b> (after <code>IN</code>), or <b>a whole table</b> (in FROM). A <em>correlated</em> subquery mentions the outer table, so it re-runs for each outer row.</p>
+      </div>
+      <div class="tw"><table>
+        <thead><tr><th>Need</th><th>Pattern</th></tr></thead>
+        <tbody>
+          <tr><td>Compare to one value</td><td><code>WHERE x &gt; (SELECT AVG(x) FROM t)</code></td></tr>
+          <tr><td>In a list from a query</td><td><code>WHERE id IN (SELECT id FROM t WHERE …)</code></td></tr>
+          <tr><td>Not in that list</td><td><code>WHERE NOT EXISTS (…)</code> <span class="c">(safer than NOT IN)</span></td></tr>
+          <tr><td>Has at least one related row</td><td><code>WHERE EXISTS (SELECT 1 FROM t WHERE t.id = outer.id)</code></td></tr>
+          <tr><td>Bigger than all / any</td><td><code>&gt; ALL (SELECT …)</code> &nbsp; <code>&gt; ANY (SELECT …)</code></td></tr>
+          <tr><td>A value per row</td><td><code>SELECT …, (SELECT COUNT(*) FROM t WHERE t.id = o.id)</code></td></tr>
+          <tr><td>A temporary table</td><td><code>FROM (SELECT …) AS t</code></td></tr>
+        </tbody>
+      </table></div>
+      <div class="code"><p class="cap">Products priced above the average</p><pre><code>SELECT ProductName, RetailPrice
+FROM SalesOrdersExample.Products
+WHERE RetailPrice &gt; (SELECT AVG(RetailPrice)
+                     FROM SalesOrdersExample.Products);</code></pre></div>
+      <div class="code"><p class="cap">Recipes that use garlic (correlated EXISTS)</p><pre><code>SELECT r.RecipeTitle
+FROM RecipesExample.Recipes AS r
+WHERE EXISTS (
+  SELECT 1
+  FROM RecipesExample.Recipe_Ingredients AS ri
+  JOIN RecipesExample.Ingredients AS i ON ri.IngredientID = i.IngredientID
+  WHERE ri.RecipeID = r.RecipeID          -- ties it to the outer row
+    AND i.IngredientName = 'Garlic');</code></pre></div>
+      <div class="traps"><b>Traps</b><ul>
+        <li>"more than one row returned by a subquery" → you used <code>=</code>; switch to <code>IN</code>.</li>
+        <li><code>IN (SELECT a, b …)</code> fails. Select exactly one column.</li>
+        <li><code>NOT IN</code> with a NULL in the list returns nothing.</li>
+        <li>Need columns from the other table in your output? Use a join instead.</li>
+      </ul></div>
+    </section>
+    <section id="v-cte" class="view" hidden data-keys="with cte common table expression named step temporary readable">
+      <header><p class="eyebrow">Nesting</p><h2>WITH (CTEs)</h2>
+        <p class="use"><b>Use it when</b> a query has a step you'd otherwise nest, like "first compute averages, then join them."</p></header>
+      <div class="how"><b>How it works</b>
+        <p><code>WITH name AS (…)</code> defines a temporary result at the top of the query. The main SELECT then uses it like a table. Same result as a subquery in FROM, but easier to read.</p>
+      </div>
+      <div class="code"><p class="cap">Top five bowlers by average score</p><pre><code>WITH bowler_avg AS (
+  SELECT BowlerID, ROUND(AVG(RawScore), 1) AS avg_score
+  FROM BowlingLeagueExample.Bowler_Scores
+  GROUP BY BowlerID
+)
+SELECT b.BowlerFirstName, b.BowlerLastName, ba.avg_score
+FROM bowler_avg AS ba
+JOIN BowlingLeagueExample.Bowlers AS b ON b.BowlerID = ba.BowlerID
+ORDER BY ba.avg_score DESC
+LIMIT 5;</code></pre></div>
+      <div class="traps"><b>Traps</b><ul>
+        <li>Several CTEs: one <code>WITH</code>, separated by commas: <code>WITH a AS (…), b AS (…) SELECT …</code>.</li>
+        <li>No semicolon between the CTE and the main SELECT. It's one statement.</li>
+      </ul></div>
+    </section>
+    <section id="v-modify" class="view" hidden data-keys="insert into values update set delete from returning begin rollback commit transaction archive modify change remove add copy foreign key">
+      <header><p class="eyebrow">Changing data</p><h2>INSERT, UPDATE, DELETE</h2>
+        <p class="use"><b>Use it when</b> an assignment changes data. Work in the <b>…Modify</b> schemas.</p></header>
+      <div class="how"><b>How it works</b>
+        <p>These statements change rows and report a count (<code>UPDATE 7</code>) instead of returning results. pgAdmin saves each one immediately unless you're inside <code>BEGIN</code>. The safe habit: write the WHERE as a SELECT first, check the rows, then change SELECT to UPDATE or DELETE.</p>
+      </div>
+      <div class="code"><p class="cap">Test a change, look at it, undo it. Highlight all lines and run together.</p><pre><code>BEGIN;
+UPDATE SalesOrdersModify.Products
+SET QuantityOnHand = QuantityOnHand + 10
+WHERE CategoryID = 6;
+SELECT ProductName, QuantityOnHand FROM SalesOrdersModify.Products WHERE CategoryID = 6;
+ROLLBACK;   -- undo. Use COMMIT; to keep it.</code></pre></div>
+      <div class="tw"><table>
+        <thead><tr><th>Need</th><th>Syntax</th></tr></thead>
+        <tbody>
+          <tr><td>Add one row</td><td class="wrap"><code>INSERT INTO t (a, b) VALUES (1, 'x');</code></td></tr>
+          <tr><td>Add several rows</td><td class="wrap"><code>VALUES (1, 'x'), (2, 'y');</code></td></tr>
+          <tr><td>Copy rows from a query</td><td class="wrap"><code>INSERT INTO t (a, b) SELECT a, b FROM s WHERE …;</code></td></tr>
+          <tr><td>See what changed</td><td class="wrap"><code>… RETURNING *;</code></td></tr>
+          <tr><td>Change values</td><td class="wrap"><code>UPDATE t SET a = a * 1.05, b = 'x' WHERE …;</code></td></tr>
+          <tr><td>Change using another table (subquery)</td><td class="wrap"><code>UPDATE t SET … WHERE id IN (SELECT id FROM s WHERE …);</code></td></tr>
+          <tr><td>Change using another table (join)</td><td class="wrap"><code>UPDATE t SET a = s.x FROM s WHERE t.id = s.id;</code></td></tr>
+          <tr><td>Delete rows</td><td class="wrap"><code>DELETE FROM t WHERE …;</code></td></tr>
+          <tr><td>Delete using another table</td><td class="wrap"><code>DELETE FROM t WHERE NOT EXISTS (SELECT 1 FROM s WHERE s.id = t.id);</code></td></tr>
+        </tbody>
+      </table></div>
+      <div class="code"><p class="cap">Archive early orders: INSERT … SELECT</p><pre><code>INSERT INTO SalesOrdersModify.Orders_Archive
+       (OrderNumber, OrderDate, ShipDate, CustomerID, EmployeeID, OrderTotal)
+SELECT OrderNumber, OrderDate, ShipDate, CustomerID, EmployeeID, OrderTotal
+FROM SalesOrdersModify.Orders
+WHERE OrderDate &lt; '2017-10-01';</code></pre></div>
+      <div class="code"><p class="cap">UPDATE from a join: reset quoted prices on one order</p><pre><code>UPDATE SalesOrdersModify.Order_Details AS od
+SET QuotedPrice = p.RetailPrice
+FROM SalesOrdersModify.Products AS p
+WHERE od.ProductNumber = p.ProductNumber
+  AND od.OrderNumber = 1;</code></pre></div>
+      <div class="traps"><b>Traps</b><ul>
+        <li>UPDATE or DELETE <b>without WHERE changes every row</b>.</li>
+        <li>Foreign keys set the order: insert parents before children; delete children (Order_Details) before parents (Orders).</li>
+        <li>After any error inside <code>BEGIN</code>, run <code>ROLLBACK;</code> before anything else.</li>
+        <li>Made a mess? Re-run <code>LoadAllTextbookDatabases.sql</code> to reset.</li>
+      </ul></div>
+    </section>
+    <section id="v-rowcount" class="view" hidden data-keys="wrong row count expected rows zero 0 rows too many too few off by one duplicates debug">
+      <header><p class="eyebrow">Fixing</p><h2>Wrong row count</h2>
+        <p class="use"><b>Use it when</b> the query runs but doesn't match "Expected rows."</p></header>
+      <div class="tw"><table>
+        <thead><tr><th>Symptom</th><th>Usual causes</th></tr></thead>
+        <tbody>
+          <tr><td><b>0 rows</b></td><td>Capitalization inside quotes · timestamp compared to a plain date · <code>= NULL</code> · LIKE without <code>%</code> · blank stored as <code>''</code> · filtering a Modify schema whose data differs</td></tr>
+          <tr><td><b>Thousands of rows</b></td><td>Comma join with no match condition · composite key joined on only one column</td></tr>
+          <tr><td><b>Too many</b></td><td>One-to-many join repeating rows (add DISTINCT or GROUP BY) · <code>OR</code> without parentheses · extra column in GROUP BY</td></tr>
+          <tr><td><b>Too few</b></td><td>Inner join dropped unmatched rows (use LEFT JOIN) · right-table filter in WHERE (move to ON) · UNION removed duplicates · range ends too early (letters, last day of month)</td></tr>
+          <tr><td><b>Off by one</b></td><td>NULL counted by DISTINCT · <code>COUNT(*)</code> vs <code>COUNT(col)</code> after a LEFT JOIN · BETWEEN includes both ends</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Find the step that goes wrong</h3>
+      <ol class="steps">
+        <li>Run just <code>FROM</code> + joins with <code>SELECT COUNT(*)</code>. Is that number sensible?</li>
+        <li>Add WHERE conditions one at a time and watch the count.</li>
+        <li>Add GROUP BY / DISTINCT last.</li>
+        <li>Look at actual values: <code>SELECT DISTINCT col … LIMIT 20</code>.</li>
+      </ol>
+    </section>
+
+  </main>
+</div>
+
+<script>
+var SCHEMAS = [{"k":"salesordersexample","name":"SalesOrdersExample","views":99,"tables":[{"n":"Categories","rows":6,"drv":false,"c":[["CategoryID","integer",1,""],["CategoryDescription","varchar",0,""]]},{"n":"Customers","rows":28,"drv":false,"c":[["CustomerID","integer",1,""],["CustFirstName","varchar",0,""],["CustLastName","varchar",0,""],["CustStreetAddress","varchar",0,""],["CustCity","varchar",0,""],["CustState","varchar",0,""],["CustZipCode","varchar",0,""],["CustAreaCode","smallint",0,""],["CustPhoneNumber","varchar",0,""]]},{"n":"Employees","rows":8,"drv":false,"c":[["EmployeeID","integer",1,""],["EmpFirstName","varchar",0,""],["EmpLastName","varchar",0,""],["EmpStreetAddress","varchar",0,""],["EmpCity","varchar",0,""],["EmpState","varchar",0,""],["EmpZipCode","varchar",0,""],["EmpAreaCode","smallint",0,""],["EmpPhoneNumber","varchar",0,""],["EmpBirthDate","date",0,""]]},{"n":"Order_Details","rows":3973,"drv":false,"c":[["OrderNumber","integer",1,"Orders.OrderNumber"],["ProductNumber","integer",1,"Products.ProductNumber"],["QuotedPrice","numeric",0,""],["QuantityOrdered","smallint",0,""]]},{"n":"Orders","rows":944,"drv":false,"c":[["OrderNumber","integer",1,""],["OrderDate","date",0,""],["ShipDate","date",0,""],["CustomerID","integer",0,"Customers.CustomerID"],["EmployeeID","integer",0,"Employees.EmployeeID"]]},{"n":"Product_Vendors","rows":90,"drv":false,"c":[["ProductNumber","integer",1,"Products.ProductNumber"],["VendorID","integer",1,"Vendors.VendorID"],["WholesalePrice","numeric",0,""],["DaysToDeliver","smallint",0,""]]},{"n":"Products","rows":40,"drv":false,"c":[["ProductNumber","integer",1,""],["ProductName","varchar",0,""],["ProductDescription","varchar",0,""],["RetailPrice","numeric",0,""],["QuantityOnHand","smallint",0,""],["CategoryID","integer",0,"Categories.CategoryID"]]},{"n":"Vendors","rows":10,"drv":false,"c":[["VendorID","integer",1,""],["VendName","varchar",0,""],["VendStreetAddress","varchar",0,""],["VendCity","varchar",0,""],["VendState","varchar",0,""],["VendZipCode","varchar",0,""],["VendPhoneNumber","varchar",0,""],["VendFaxNumber","varchar",0,""],["VendWebPage","text",0,""],["VendEMailAddress","varchar",0,""]]},{"n":"ztblMonths","rows":36,"drv":true,"c":[["MonthYear","varchar",0,""],["YearNumber","smallint",1,""],["MonthNumber","smallint",1,""],["MonthStart","timestamp",0,""],["MonthEnd","timestamp",0,""],["January","smallint",0,""],["February","smallint",0,""],["March","smallint",0,""],["April","smallint",0,""],["May","smallint",0,""],["June","smallint",0,""],["July","smallint",0,""],["August","smallint",0,""],["September","smallint",0,""],["October","smallint",0,""],["November","smallint",0,""],["December","smallint",0,""]]},{"n":"ztblPriceRanges","rows":4,"drv":true,"c":[["PriceCategory","varchar",1,""],["LowPrice","numeric",0,""],["HighPrice","numeric",0,""]]},{"n":"ztblPurchaseCoupons","rows":6,"drv":true,"c":[["LowSpend","numeric",1,""],["HighSpend","numeric",0,""],["NumCoupons","smallint",0,""]]},{"n":"ztblSeqNumbers","rows":60,"drv":true,"c":[["Sequence","integer",1,""]]}],"joins":[["Order_Details","Orders","Order_Details.OrderNumber = Orders.OrderNumber"],["Order_Details","Products","Order_Details.ProductNumber = Products.ProductNumber"],["Orders","Customers","Orders.CustomerID = Customers.CustomerID"],["Orders","Employees","Orders.EmployeeID = Employees.EmployeeID"],["Product_Vendors","Products","Product_Vendors.ProductNumber = Products.ProductNumber"],["Product_Vendors","Vendors","Product_Vendors.VendorID = Vendors.VendorID"],["Products","Categories","Products.CategoryID = Categories.CategoryID"]]},{"k":"entertainmentagencyexample","name":"EntertainmentAgencyExample","views":101,"tables":[{"n":"Agents","rows":9,"drv":false,"c":[["AgentID","integer",1,""],["AgtFirstName","varchar",0,""],["AgtLastName","varchar",0,""],["AgtStreetAddress","varchar",0,""],["AgtCity","varchar",0,""],["AgtState","varchar",0,""],["AgtZipCode","varchar",0,""],["AgtPhoneNumber","varchar",0,""],["DateHired","date",0,""],["Salary","numeric",0,""],["CommissionRate","real",0,""]]},{"n":"Customers","rows":15,"drv":false,"c":[["CustomerID","integer",1,""],["CustFirstName","varchar",0,""],["CustLastName","varchar",0,""],["CustStreetAddress","varchar",0,""],["CustCity","varchar",0,""],["CustState","varchar",0,""],["CustZipCode","varchar",0,""],["CustPhoneNumber","varchar",0,""]]},{"n":"Engagements","rows":111,"drv":false,"c":[["EngagementNumber","integer",1,""],["StartDate","date",0,""],["EndDate","date",0,""],["StartTime","time",0,""],["StopTime","time",0,""],["ContractPrice","numeric",0,""],["CustomerID","integer",0,"Customers.CustomerID"],["AgentID","integer",0,"Agents.AgentID"],["EntertainerID","integer",0,"Entertainers.EntertainerID"]]},{"n":"Entertainer_Members","rows":40,"drv":false,"c":[["EntertainerID","integer",1,"Entertainers.EntertainerID"],["MemberID","integer",1,"Members.MemberID"],["Status","smallint",0,""]]},{"n":"Entertainer_Styles","rows":32,"drv":false,"c":[["EntertainerID","integer",1,"Entertainers.EntertainerID"],["StyleID","integer",1,"Musical_Styles.StyleID"],["StyleStrength","smallint",0,""]]},{"n":"Entertainers","rows":13,"drv":false,"c":[["EntertainerID","integer",1,""],["EntStageName","varchar",0,""],["EntSSN","varchar",0,""],["EntStreetAddress","varchar",0,""],["EntCity","varchar",0,""],["EntState","varchar",0,""],["EntZipCode","varchar",0,""],["EntPhoneNumber","varchar",0,""],["EntWebPage","varchar",0,""],["EntEMailAddress","varchar",0,""],["DateEntered","date",0,""]]},{"n":"Members","rows":25,"drv":false,"c":[["MemberID","integer",1,""],["MbrFirstName","varchar",0,""],["MbrLastName","varchar",0,""],["MbrPhoneNumber","varchar",0,""],["Gender","varchar",0,""]]},{"n":"Musical_Preferences","rows":36,"drv":false,"c":[["CustomerID","integer",1,"Customers.CustomerID"],["StyleID","integer",1,"Musical_Styles.StyleID"],["PreferenceSeq","smallint",0,""]]},{"n":"Musical_Styles","rows":25,"drv":false,"c":[["StyleID","integer",1,""],["StyleName","varchar",0,""]]},{"n":"ztblDays","rows":1096,"drv":true,"c":[["DateField","date",1,""]]},{"n":"ztblMonths","rows":36,"drv":true,"c":[["MonthYear","varchar",0,""],["YearNumber","smallint",1,""],["MonthNumber","smallint",1,""],["MonthStart","date",0,""],["MonthEnd","date",0,""],["January","smallint",0,""],["February","smallint",0,""],["March","smallint",0,""],["April","smallint",0,""],["May","smallint",0,""],["June","smallint",0,""],["July","smallint",0,""],["August","smallint",0,""],["September","smallint",0,""],["October","smallint",0,""],["November","smallint",0,""],["December","smallint",0,""]]},{"n":"ztblSkipLabels","rows":60,"drv":true,"c":[["LabelCount","integer",1,""]]},{"n":"ztblWeeks","rows":156,"drv":true,"c":[["WeekStart","date",1,""],["WeekEnd","date",0,""]]}],"joins":[["Engagements","Agents","Engagements.AgentID = Agents.AgentID"],["Engagements","Customers","Engagements.CustomerID = Customers.CustomerID"],["Engagements","Entertainers","Engagements.EntertainerID = Entertainers.EntertainerID"],["Entertainer_Members","Entertainers","Entertainer_Members.EntertainerID = Entertainers.EntertainerID"],["Entertainer_Members","Members","Entertainer_Members.MemberID = Members.MemberID"],["Entertainer_Styles","Entertainers","Entertainer_Styles.EntertainerID = Entertainers.EntertainerID"],["Entertainer_Styles","Musical_Styles","Entertainer_Styles.StyleID = Musical_Styles.StyleID"],["Musical_Preferences","Customers","Musical_Preferences.CustomerID = Customers.CustomerID"],["Musical_Preferences","Musical_Styles","Musical_Preferences.StyleID = Musical_Styles.StyleID"]]},{"k":"schoolschedulingexample","name":"SchoolSchedulingExample","views":108,"tables":[{"n":"Buildings","rows":6,"drv":false,"c":[["BuildingCode","varchar",1,""],["BuildingName","varchar",0,""],["NumberOfFloors","smallint",0,""],["ElevatorAccess","integer",0,""],["SiteParkingAvailable","integer",0,""]]},{"n":"Categories","rows":19,"drv":false,"c":[["CategoryID","varchar",1,""],["CategoryDescription","varchar",0,""],["DepartmentID","integer",0,"Departments.DepartmentID"]]},{"n":"Class_Rooms","rows":47,"drv":false,"c":[["ClassRoomID","integer",1,""],["BuildingCode","varchar",0,"Buildings.BuildingCode"],["PhoneAvailable","integer",0,""],["Capacity","smallint",0,""]]},{"n":"Classes","rows":132,"drv":false,"c":[["ClassID","integer",1,""],["SubjectID","integer",0,"Subjects.SubjectID"],["ClassRoomID","integer",0,"Class_Rooms.ClassRoomID"],["Credits","smallint",0,""],["SemesterNumber","smallint",0,""],["StartDate","date",0,""],["StartTime","time",0,""],["Duration","smallint",0,""],["MondaySchedule","integer",0,""],["TuesdaySchedule","integer",0,""],["WednesdaySchedule","integer",0,""],["ThursdaySchedule","integer",0,""],["FridaySchedule","integer",0,""],["SaturdaySchedule","integer",0,""]]},{"n":"Departments","rows":5,"drv":false,"c":[["DepartmentID","integer",1,""],["DeptName","varchar",0,""],["DeptChair","integer",0,"Staff.StaffID"]]},{"n":"Faculty","rows":24,"drv":false,"c":[["StaffID","integer",1,"Staff.StaffID"],["Title","varchar",0,""],["Status","varchar",0,""],["Tenured","integer",0,""]]},{"n":"Faculty_Categories","rows":76,"drv":false,"c":[["StaffID","integer",1,"Faculty.StaffID"],["CategoryID","varchar",1,"Categories.CategoryID"]]},{"n":"Faculty_Classes","rows":130,"drv":false,"c":[["ClassID","integer",1,"Classes.ClassID"],["StaffID","integer",1,"Staff.StaffID"]]},{"n":"Faculty_Subjects","rows":110,"drv":false,"c":[["StaffID","integer",1,"Faculty.StaffID"],["SubjectID","integer",1,"Subjects.SubjectID"],["ProficiencyRating","real",0,""]]},{"n":"Majors","rows":7,"drv":false,"c":[["MajorID","integer",1,""],["Major","varchar",0,""]]},{"n":"Staff","rows":27,"drv":false,"c":[["StaffID","integer",1,""],["StfFirstName","varchar",0,""],["StfLastname","varchar",0,""],["StfStreetAddress","varchar",0,""],["StfCity","varchar",0,""],["StfState","varchar",0,""],["StfZipCode","varchar",0,""],["StfAreaCode","varchar",0,""],["StfPhoneNumber","varchar",0,""],["Salary","numeric",0,""],["DateHired","date",0,""],["Position","varchar",0,""]]},{"n":"Student_Class_Status","rows":3,"drv":false,"c":[["ClassStatus","integer",1,""],["ClassStatusDescription","varchar",0,""]]},{"n":"Student_Schedules","rows":120,"drv":false,"c":[["StudentID","integer",1,"Students.StudentID"],["ClassID","integer",1,"Classes.ClassID"],["ClassStatus","integer",0,"Student_Class_Status.ClassStatus"],["Grade","real",0,""]]},{"n":"Students","rows":18,"drv":false,"c":[["StudentID","integer",1,""],["StudFirstName","varchar",0,""],["StudLastName","varchar",0,""],["StudStreetAddress","varchar",0,""],["StudCity","varchar",0,""],["StudState","varchar",0,""],["StudZipCode","varchar",0,""],["StudAreaCode","varchar",0,""],["StudPhoneNumber","varchar",0,""],["StudBirthDate","date",0,""],["StudGender","varchar",0,""],["StudMaritalStatus","varchar",0,""],["StudMajor","integer",0,"Majors.MajorID"]]},{"n":"Subjects","rows":56,"drv":false,"c":[["SubjectID","integer",1,""],["CategoryID","varchar",0,"Categories.CategoryID"],["SubjectCode","varchar",0,""],["SubjectName","varchar",0,""],["SubjectPreReq","varchar",0,"Subjects.SubjectCode"],["SubjectDescription","text",0,""],["SubjectEstClassSize","smallint",0,""]]},{"n":"ztblGenderMatrix","rows":2,"drv":true,"c":[["Gender","varchar",1,""],["Male","smallint",0,""],["Female","smallint",0,""]]},{"n":"ztblLetterGrades","rows":13,"drv":true,"c":[["LetterGrade","varchar",1,""],["LowGradePoint","real",0,""],["HighGradePoint","real",0,""]]},{"n":"ztblMaritalStatusMatrix","rows":4,"drv":true,"c":[["MaritalStatus","varchar",1,""],["Married","smallint",0,""],["Single","smallint",0,""],["Widowed","smallint",0,""],["Divorced","smallint",0,""]]},{"n":"ztblProfRatings","rows":4,"drv":true,"c":[["ProfRatingDesc","varchar",0,""],["ProfRatingLow","float",1,""],["ProfRatingHigh","float",0,""]]},{"n":"ztblSemesterDays","rows":176,"drv":true,"c":[["SemesterNo","smallint",1,""],["SemDate","date",1,""],["SemDayName","varchar",0,""]]},{"n":"ztblSeqNumbers","rows":60,"drv":true,"c":[["Sequence","integer",1,""]]}],"joins":[["Categories","Departments","Categories.DepartmentID = Departments.DepartmentID"],["Class_Rooms","Buildings","Class_Rooms.BuildingCode = Buildings.BuildingCode"],["Classes","Class_Rooms","Classes.ClassRoomID = Class_Rooms.ClassRoomID"],["Classes","Subjects","Classes.SubjectID = Subjects.SubjectID"],["Departments","Staff","Departments.DeptChair = Staff.StaffID"],["Faculty","Staff","Faculty.StaffID = Staff.StaffID"],["Faculty_Categories","Categories","Faculty_Categories.CategoryID = Categories.CategoryID"],["Faculty_Categories","Faculty","Faculty_Categories.StaffID = Faculty.StaffID"],["Faculty_Classes","Classes","Faculty_Classes.ClassID = Classes.ClassID"],["Faculty_Classes","Faculty","Faculty_Classes.StaffID = Faculty.StaffID"],["Faculty_Classes","Staff","Faculty_Classes.StaffID = Staff.StaffID"],["Faculty_Subjects","Faculty","Faculty_Subjects.StaffID = Faculty.StaffID"],["Faculty_Subjects","Subjects","Faculty_Subjects.SubjectID = Subjects.SubjectID"],["Student_Schedules","Classes","Student_Schedules.ClassID = Classes.ClassID"],["Student_Schedules","Student_Class_Status","Student_Schedules.ClassStatus = Student_Class_Status.ClassStatus"],["Student_Schedules","Students","Student_Schedules.StudentID = Students.StudentID"],["Students","Majors","Students.StudMajor = Majors.MajorID"],["Subjects","Categories","Subjects.CategoryID = Categories.CategoryID"],["Subjects","Subjects","Subjects.SubjectPreReq = Subjects.SubjectCode"]]},{"k":"bowlingleagueexample","name":"BowlingLeagueExample","views":71,"tables":[{"n":"Bowler_Scores","rows":1344,"drv":false,"c":[["MatchID","integer",1,"Match_Games.MatchID"],["GameNumber","smallint",1,"Match_Games.GameNumber"],["BowlerID","integer",1,"Bowlers.BowlerID"],["RawScore","smallint",0,""],["HandiCapScore","smallint",0,""],["WonGame","smallint",0,""]]},{"n":"Bowlers","rows":32,"drv":false,"c":[["BowlerID","integer",1,""],["BowlerLastName","varchar",0,""],["BowlerFirstName","varchar",0,""],["BowlerMiddleInit","varchar",0,""],["BowlerAddress","varchar",0,""],["BowlerCity","varchar",0,""],["BowlerState","varchar",0,""],["BowlerZip","varchar",0,""],["BowlerPhoneNumber","varchar",0,""],["TeamID","integer",0,"Teams.TeamID"]]},{"n":"Match_Games","rows":168,"drv":false,"c":[["MatchID","integer",1,"Tourney_Matches.MatchID"],["GameNumber","smallint",1,""],["WinningTeamID","integer",0,""]]},{"n":"Teams","rows":10,"drv":false,"c":[["TeamID","integer",1,""],["TeamName","varchar",0,""],["CaptainID","integer",0,""]]},{"n":"Tournaments","rows":20,"drv":false,"c":[["TourneyID","integer",1,""],["TourneyDate","date",0,""],["TourneyLocation","varchar",0,""]]},{"n":"Tourney_Matches","rows":57,"drv":false,"c":[["MatchID","integer",1,""],["TourneyID","integer",0,"Tournaments.TourneyID"],["Lanes","varchar",0,""],["OddLaneTeamID","integer",0,"Teams.TeamID"],["EvenLaneTeamID","integer",0,"Teams.TeamID"]]},{"n":"ztblBowlerRatings","rows":5,"drv":true,"c":[["BowlerRating","varchar",1,""],["BowlerLowAvg","smallint",0,""],["BowlerHighAvg","smallint",0,""]]},{"n":"ztblSkipLabels","rows":60,"drv":true,"c":[["LabelCount","integer",1,""]]},{"n":"ztblWeeks","rows":105,"drv":true,"c":[["WeekStart","date",1,""],["WeekEnd","date",0,""]]}],"joins":[["Bowler_Scores","Bowlers","Bowler_Scores.BowlerID = Bowlers.BowlerID"],["Bowler_Scores","Match_Games","Bowler_Scores.MatchID = Match_Games.MatchID AND Bowler_Scores.GameNumber = Match_Games.GameNumber"],["Bowlers","Teams","Bowlers.TeamID = Teams.TeamID"],["Match_Games","Tourney_Matches","Match_Games.MatchID = Tourney_Matches.MatchID"],["Tourney_Matches","Teams","Tourney_Matches.EvenLaneTeamID = Teams.TeamID"],["Tourney_Matches","Teams","Tourney_Matches.OddLaneTeamID = Teams.TeamID"],["Tourney_Matches","Tournaments","Tourney_Matches.TourneyID = Tournaments.TourneyID"]]},{"k":"recipesexample","name":"RecipesExample","views":60,"tables":[{"n":"Ingredient_Classes","rows":24,"drv":false,"c":[["IngredientClassID","smallint",1,""],["IngredientClassDescription","varchar",0,""]]},{"n":"Ingredients","rows":79,"drv":false,"c":[["IngredientID","integer",1,""],["IngredientName","varchar",0,""],["IngredientClassID","smallint",0,"Ingredient_Classes.IngredientClassID"],["MeasureAmountID","smallint",0,"Measurements.MeasureAmountID"]]},{"n":"Measurements","rows":26,"drv":false,"c":[["MeasureAmountID","smallint",1,""],["MeasurementDescription","varchar",0,""]]},{"n":"Recipe_Classes","rows":7,"drv":false,"c":[["RecipeClassID","smallint",1,""],["RecipeClassDescription","varchar",0,""]]},{"n":"Recipe_Ingredients","rows":88,"drv":false,"c":[["RecipeID","integer",1,"Recipes.RecipeID"],["RecipeSeqNo","smallint",1,""],["IngredientID","integer",0,"Ingredients.IngredientID"],["MeasureAmountID","smallint",0,"Measurements.MeasureAmountID"],["Amount","real",0,""]]},{"n":"Recipes","rows":15,"drv":false,"c":[["RecipeID","integer",1,""],["RecipeTitle","varchar",0,""],["RecipeClassID","smallint",0,"Recipe_Classes.RecipeClassID"],["Preparation","text",0,""],["Notes","text",0,""]]}],"joins":[["Ingredients","Ingredient_Classes","Ingredients.IngredientClassID = Ingredient_Classes.IngredientClassID"],["Ingredients","Measurements","Ingredients.MeasureAmountID = Measurements.MeasureAmountID"],["Recipe_Ingredients","Ingredients","Recipe_Ingredients.IngredientID = Ingredients.IngredientID"],["Recipe_Ingredients","Measurements","Recipe_Ingredients.MeasureAmountID = Measurements.MeasureAmountID"],["Recipe_Ingredients","Recipes","Recipe_Ingredients.RecipeID = Recipes.RecipeID"],["Recipes","Recipe_Classes","Recipes.RecipeClassID = Recipe_Classes.RecipeClassID"]]},{"k":"student","name":"student","views":0,"tables":[{"n":"course","rows":30,"drv":false,"c":[["course_no","numeric",1,""],["description","varchar",0,""],["cost","numeric",0,""],["prerequisite","numeric",0,"course.course_no"],["created_by","varchar",0,""],["created_date","timestamp",0,""],["modified_by","varchar",0,""],["modified_date","timestamp",0,""]]},{"n":"enrollment","rows":226,"drv":false,"c":[["student_id","numeric",1,"student.student_id"],["section_id","numeric",1,"section.section_id"],["enroll_date","timestamp",0,""],["final_grade","numeric",0,""],["created_by","varchar",0,""],["created_date","timestamp",0,""],["modified_by","varchar",0,""],["modified_date","timestamp",0,""]]},{"n":"grade","rows":2004,"drv":false,"c":[["student_id","numeric",1,"enrollment.student_id"],["section_id","numeric",1,"enrollment.section_id"],["grade_type_code","varchar",1,"grade_type_weight.grade_type_code"],["grade_code_occurrence","numeric",1,""],["numeric_grade","numeric",0,""],["comments","varchar",0,""],["created_by","varchar",0,""],["created_date","timestamp",0,""],["modified_by","varchar",0,""],["modified_date","timestamp",0,""]]},{"n":"grade_conversion","rows":15,"drv":false,"c":[["letter_grade","varchar",0,""],["grade_point","numeric",0,""],["max_grade","numeric",0,""],["min_grade","numeric",0,""],["created_by","varchar",0,""],["created_date","timestamp",0,""],["modified_by","varchar",0,""],["modified_date","timestamp",0,""]]},{"n":"grade_type","rows":6,"drv":false,"c":[["grade_type_code","varchar",1,""],["description","varchar",0,""],["created_by","varchar",0,""],["created_date","timestamp",0,""],["modified_by","varchar",0,""],["modified_date","timestamp",0,""]]},{"n":"grade_type_weight","rows":300,"drv":false,"c":[["section_id","numeric",1,"section.section_id"],["grade_type_code","varchar",1,"grade_type.grade_type_code"],["number_per_section","numeric",0,""],["percent_of_final_grade","numeric",0,""],["drop_lowest","varchar",0,""],["created_by","varchar",0,""],["created_date","timestamp",0,""],["modified_by","varchar",0,""],["modified_date","timestamp",0,""]]},{"n":"instructor","rows":10,"drv":false,"c":[["instructor_id","numeric",1,""],["salutation","varchar",0,""],["first_name","varchar",0,""],["last_name","varchar",0,""],["street_address","varchar",0,""],["zip","varchar",0,"zipcode.zip"],["phone","varchar",0,""],["created_by","varchar",0,""],["created_date","timestamp",0,""],["modified_by","varchar",0,""],["modified_date","timestamp",0,""]]},{"n":"section","rows":78,"drv":false,"c":[["section_id","numeric",1,""],["course_no","numeric",0,"course.course_no"],["section_no","numeric",0,""],["start_date_time","timestamp",0,""],["location","varchar",0,""],["instructor_id","numeric",0,""],["capacity","numeric",0,""],["created_by","varchar",0,""],["created_date","timestamp",0,""],["modified_by","varchar",0,""],["modified_date","timestamp",0,""]]},{"n":"student","rows":268,"drv":false,"c":[["student_id","numeric",1,""],["salutation","varchar",0,""],["first_name","varchar",0,""],["last_name","varchar",0,""],["street_address","varchar",0,""],["zip","varchar",0,"zipcode.zip"],["phone","varchar",0,""],["employer","varchar",0,""],["registration_date","timestamp",0,""],["created_by","varchar",0,""],["created_date","timestamp",0,""],["modified_by","varchar",0,""],["modified_date","timestamp",0,""]]},{"n":"zipcode","rows":227,"drv":false,"c":[["zip","varchar",1,""],["city","varchar",0,""],["state","varchar",0,""],["created_by","varchar",0,""],["created_date","timestamp",0,""],["modified_by","varchar",0,""],["modified_date","timestamp",0,""]]}],"joins":[["course","course","course.prerequisite = course.course_no"],["enrollment","section","enrollment.section_id = section.section_id"],["enrollment","student","enrollment.student_id = student.student_id"],["grade","grade_type_weight","grade.section_id = grade_type_weight.section_id AND grade.grade_type_code = grade_type_weight.grade_type_code"],["grade","enrollment","grade.student_id = enrollment.student_id AND grade.section_id = enrollment.section_id"],["grade_type_weight","grade_type","grade_type_weight.grade_type_code = grade_type.grade_type_code"],["grade_type_weight","section","grade_type_weight.section_id = section.section_id"],["instructor","zipcode","instructor.zip = zipcode.zip"],["section","course","section.course_no = course.course_no"],["student","zipcode","student.zip = zipcode.zip"]]},{"k":"salesordersmodify","name":"SalesOrdersModify","views":28,"tables":[{"n":"Categories","rows":7,"drv":false,"c":[["CategoryID","integer",1,""],["CategoryDescription","varchar",0,""]]},{"n":"Customers","rows":28,"drv":false,"c":[["CustomerID","integer",1,""],["CustFirstName","varchar",0,""],["CustLastName","varchar",0,""],["CustStreetAddress","varchar",0,""],["CustCity","varchar",0,""],["CustState","varchar",0,""],["CustZipCode","varchar",0,""],["CustAreaCode","smallint",0,""],["CustPhoneNumber","varchar",0,""]]},{"n":"Employees","rows":9,"drv":false,"c":[["EmployeeID","integer",1,""],["EmpFirstName","varchar",0,""],["EmpLastName","varchar",0,""],["EmpStreetAddress","varchar",0,""],["EmpCity","varchar",0,""],["EmpState","varchar",0,""],["EmpZipCode","varchar",0,""],["EmpAreaCode","smallint",0,""],["EmpPhoneNumber","varchar",0,""]]},{"n":"Order_Details","rows":3975,"drv":false,"c":[["OrderNumber","integer",1,"Orders.OrderNumber"],["ProductNumber","integer",1,"Products.ProductNumber"],["QuotedPrice","numeric",0,""],["QuantityOrdered","smallint",0,""]]},{"n":"Order_Details_Archive","rows":0,"drv":false,"c":[["OrderNumber","integer",1,"Orders_Archive.OrderNumber"],["ProductNumber","integer",1,""],["QuotedPrice","numeric",0,""],["QuantityOrdered","smallint",0,""]]},{"n":"Orders","rows":944,"drv":false,"c":[["OrderNumber","integer",1,""],["OrderDate","date",0,""],["ShipDate","date",0,""],["CustomerID","integer",0,"Customers.CustomerID"],["EmployeeID","integer",0,"Employees.EmployeeID"],["OrderTotal","numeric",0,""]]},{"n":"Orders_Archive","rows":0,"drv":false,"c":[["OrderNumber","integer",1,""],["OrderDate","date",0,""],["ShipDate","date",0,""],["CustomerID","integer",0,""],["EmployeeID","integer",0,""],["OrderTotal","numeric",0,""]]},{"n":"Product_Vendors","rows":90,"drv":false,"c":[["ProductNumber","integer",1,"Products.ProductNumber"],["VendorID","integer",1,"Vendors.VendorID"],["WholesalePrice","numeric",0,""],["DaysToDeliver","smallint",0,""]]},{"n":"Products","rows":40,"drv":false,"c":[["ProductNumber","integer",1,""],["ProductName","varchar",0,""],["ProductDescription","varchar",0,""],["RetailPrice","numeric",0,""],["QuantityOnHand","smallint",0,""],["CategoryID","integer",0,"Categories.CategoryID"]]},{"n":"Vendors","rows":11,"drv":false,"c":[["VendorID","integer",1,""],["VendName","varchar",0,""],["VendStreetAddress","varchar",0,""],["VendCity","varchar",0,""],["VendState","varchar",0,""],["VendZipCode","varchar",0,""],["VendPhoneNumber","varchar",0,""],["VendFaxNumber","varchar",0,""],["VendWebPage","text",0,""],["VendEMailAddress","varchar",0,""]]}],"joins":[["Order_Details","Orders","Order_Details.OrderNumber = Orders.OrderNumber"],["Order_Details","Products","Order_Details.ProductNumber = Products.ProductNumber"],["Order_Details_Archive","Orders_Archive","Order_Details_Archive.OrderNumber = Orders_Archive.OrderNumber"],["Orders","Customers","Orders.CustomerID = Customers.CustomerID"],["Orders","Employees","Orders.EmployeeID = Employees.EmployeeID"],["Product_Vendors","Products","Product_Vendors.ProductNumber = Products.ProductNumber"],["Product_Vendors","Vendors","Product_Vendors.VendorID = Vendors.VendorID"],["Products","Categories","Products.CategoryID = Categories.CategoryID"]],"diff":{"added":["Order_Details_Archive","Orders_Archive"],"missing":["ztblMonths","ztblPriceRanges","ztblPurchaseCoupons","ztblSeqNumbers"],"cols":[["Employees",[],["EmpBirthDate"]],["Orders",["OrderTotal"],[]]]}},{"k":"entertainmentagencymodify","name":"EntertainmentAgencyModify","views":18,"tables":[{"n":"Agents","rows":9,"drv":false,"c":[["AgentID","integer",1,""],["AgtFirstName","varchar",0,""],["AgtLastName","varchar",0,""],["AgtStreetAddress","varchar",0,""],["AgtCity","varchar",0,""],["AgtState","varchar",0,""],["AgtZipCode","varchar",0,""],["AgtPhoneNumber","varchar",0,""],["DateHired","date",0,""],["Salary","numeric",0,""],["CommissionRate","real",0,""]]},{"n":"Customers","rows":15,"drv":false,"c":[["CustomerID","integer",1,""],["CustFirstName","varchar",0,""],["CustLastName","varchar",0,""],["CustStreetAddress","varchar",0,""],["CustCity","varchar",0,""],["CustState","varchar",0,""],["CustZipCode","varchar",0,""],["CustPhoneNumber","varchar",0,""]]},{"n":"Engagements","rows":111,"drv":false,"c":[["EngagementNumber","integer",1,""],["StartDate","date",0,""],["EndDate","date",0,""],["StartTime","time",0,""],["StopTime","time",0,""],["ContractPrice","numeric",0,""],["CustomerID","integer",0,"Customers.CustomerID"],["AgentID","integer",0,"Agents.AgentID"],["EntertainerID","integer",0,"Entertainers.EntertainerID"]]},{"n":"Engagements_Archive","rows":0,"drv":false,"c":[["EngagementNumber","integer",1,""],["StartDate","date",0,""],["EndDate","date",0,""],["StartTime","time",0,""],["StopTime","time",0,""],["ContractPrice","numeric",0,""],["CustomerID","integer",0,""],["AgentID","integer",0,""],["EntertainerID","integer",0,""]]},{"n":"Entertainer_Members","rows":40,"drv":false,"c":[["EntertainerID","integer",1,"Entertainers.EntertainerID"],["MemberID","integer",1,"Members.MemberID"],["Status","smallint",0,""]]},{"n":"Entertainer_Styles","rows":32,"drv":false,"c":[["EntertainerID","integer",1,"Entertainers.EntertainerID"],["StyleID","integer",1,"Musical_Styles.StyleID"]]},{"n":"Entertainers","rows":13,"drv":false,"c":[["EntertainerID","integer",1,""],["EntStageName","varchar",0,""],["EntSSN","varchar",0,""],["EntStreetAddress","varchar",0,""],["EntCity","varchar",0,""],["EntState","varchar",0,""],["EntZipCode","varchar",0,""],["EntPhoneNumber","varchar",0,""],["EntWebPage","varchar",0,""],["EntEMailAddress","varchar",0,""],["DateEntered","date",0,""],["EntPricePerDay","numeric",0,""]]},{"n":"Members","rows":25,"drv":false,"c":[["MemberID","integer",1,""],["MbrFirstName","varchar",0,""],["MbrLastName","varchar",0,""],["MbrPhoneNumber","varchar",0,""],["Gender","varchar",0,""]]},{"n":"Musical_Preferences","rows":36,"drv":false,"c":[["CustomerID","integer",1,"Customers.CustomerID"],["StyleID","integer",1,"Musical_Styles.StyleID"]]},{"n":"Musical_Styles","rows":25,"drv":false,"c":[["StyleID","integer",1,""],["StyleName","varchar",0,""]]}],"joins":[["Engagements","Agents","Engagements.AgentID = Agents.AgentID"],["Engagements","Customers","Engagements.CustomerID = Customers.CustomerID"],["Engagements","Entertainers","Engagements.EntertainerID = Entertainers.EntertainerID"],["Entertainer_Members","Entertainers","Entertainer_Members.EntertainerID = Entertainers.EntertainerID"],["Entertainer_Members","Members","Entertainer_Members.MemberID = Members.MemberID"],["Entertainer_Styles","Entertainers","Entertainer_Styles.EntertainerID = Entertainers.EntertainerID"],["Entertainer_Styles","Musical_Styles","Entertainer_Styles.StyleID = Musical_Styles.StyleID"],["Musical_Preferences","Customers","Musical_Preferences.CustomerID = Customers.CustomerID"],["Musical_Preferences","Musical_Styles","Musical_Preferences.StyleID = Musical_Styles.StyleID"]],"diff":{"added":["Engagements_Archive"],"missing":["ztblDays","ztblMonths","ztblSkipLabels","ztblWeeks"],"cols":[["Entertainer_Styles",[],["StyleStrength"]],["Entertainers",["EntPricePerDay"],[]],["Musical_Preferences",[],["PreferenceSeq"]]]}},{"k":"schoolschedulingmodify","name":"SchoolSchedulingModify","views":13,"tables":[{"n":"Buildings","rows":6,"drv":false,"c":[["BuildingCode","varchar",1,""],["BuildingName","varchar",0,""],["NumberOfFloors","smallint",0,""],["ElevatorAccess","integer",0,""],["SiteParkingAvailable","integer",0,""]]},{"n":"Categories","rows":19,"drv":false,"c":[["CategoryID","varchar",1,""],["CategoryDescription","varchar",0,""],["DepartmentID","integer",0,"Departments.DepartmentID"]]},{"n":"Class_Rooms","rows":47,"drv":false,"c":[["ClassRoomID","integer",1,""],["BuildingCode","varchar",0,"Buildings.BuildingCode"],["PhoneAvailable","integer",0,""]]},{"n":"Classes","rows":147,"drv":false,"c":[["ClassID","integer",1,""],["SubjectID","integer",0,"Subjects.SubjectID"],["ClassRoomID","integer",0,"Class_Rooms.ClassRoomID"],["Credits","smallint",0,""],["StartDate","date",0,""],["StartTime","time",0,""],["Duration","smallint",0,""],["MondaySchedule","integer",0,""],["TuesdaySchedule","integer",0,""],["WednesdaySchedule","integer",0,""],["ThursdaySchedule","integer",0,""],["FridaySchedule","integer",0,""],["SaturdaySchedule","integer",0,""]]},{"n":"Departments","rows":5,"drv":false,"c":[["DepartmentID","integer",1,""],["DeptName","varchar",0,""],["DeptChair","integer",0,"Staff.StaffID"]]},{"n":"Faculty","rows":24,"drv":false,"c":[["StaffID","integer",1,"Staff.StaffID"],["Title","varchar",0,""],["Status","varchar",0,""],["Tenured","integer",0,""]]},{"n":"Faculty_Categories","rows":76,"drv":false,"c":[["StaffID","integer",1,"Faculty.StaffID"],["CategoryID","varchar",1,"Categories.CategoryID"]]},{"n":"Faculty_Classes","rows":145,"drv":false,"c":[["ClassID","integer",1,"Classes.ClassID"],["StaffID","integer",1,"Staff.StaffID"]]},{"n":"Faculty_Subjects","rows":110,"drv":false,"c":[["StaffID","integer",1,"Faculty.StaffID"],["SubjectID","integer",1,"Subjects.SubjectID"],["ProficiencyRating","real",0,""]]},{"n":"Majors","rows":7,"drv":false,"c":[["MajorID","integer",1,""],["Major","varchar",0,""]]},{"n":"Staff","rows":27,"drv":false,"c":[["StaffID","integer",1,""],["StfFirstName","varchar",0,""],["StfLastname","varchar",0,""],["StfStreetAddress","varchar",0,""],["StfCity","varchar",0,""],["StfState","varchar",0,""],["StfZipCode","varchar",0,""],["StfAreaCode","varchar",0,""],["StfPhoneNumber","varchar",0,""],["Salary","numeric",0,""],["DateHired","date",0,""],["Position","varchar",0,""]]},{"n":"Student_Class_Status","rows":3,"drv":false,"c":[["ClassStatus","integer",1,""],["ClassStatusDescription","varchar",0,""]]},{"n":"Student_Schedules","rows":120,"drv":false,"c":[["StudentID","integer",1,"Students.StudentID"],["ClassID","integer",1,"Classes.ClassID"],["ClassStatus","integer",0,"Student_Class_Status.ClassStatus"],["Grade","float",0,""]]},{"n":"Students","rows":19,"drv":false,"c":[["StudentID","integer",1,""],["StudFirstName","varchar",0,""],["StudLastName","varchar",0,""],["StudStreetAddress","varchar",0,""],["StudCity","varchar",0,""],["StudState","varchar",0,""],["StudZipCode","varchar",0,""],["StudAreaCode","varchar",0,""],["StudPhoneNumber","varchar",0,""],["StudGPA","float",0,""],["StudMajor","integer",0,"Majors.MajorID"]]},{"n":"Subjects","rows":56,"drv":false,"c":[["SubjectID","integer",1,""],["CategoryID","varchar",0,"Categories.CategoryID"],["SubjectCode","varchar",0,""],["SubjectName","varchar",0,""],["SubjectPreReq","varchar",0,"Subjects.SubjectCode"],["SubjectDescription","text",0,""]]}],"joins":[["Categories","Departments","Categories.DepartmentID = Departments.DepartmentID"],["Class_Rooms","Buildings","Class_Rooms.BuildingCode = Buildings.BuildingCode"],["Classes","Class_Rooms","Classes.ClassRoomID = Class_Rooms.ClassRoomID"],["Classes","Subjects","Classes.SubjectID = Subjects.SubjectID"],["Departments","Staff","Departments.DeptChair = Staff.StaffID"],["Faculty","Staff","Faculty.StaffID = Staff.StaffID"],["Faculty_Categories","Categories","Faculty_Categories.CategoryID = Categories.CategoryID"],["Faculty_Categories","Faculty","Faculty_Categories.StaffID = Faculty.StaffID"],["Faculty_Classes","Classes","Faculty_Classes.ClassID = Classes.ClassID"],["Faculty_Classes","Faculty","Faculty_Classes.StaffID = Faculty.StaffID"],["Faculty_Classes","Staff","Faculty_Classes.StaffID = Staff.StaffID"],["Faculty_Subjects","Faculty","Faculty_Subjects.StaffID = Faculty.StaffID"],["Faculty_Subjects","Subjects","Faculty_Subjects.SubjectID = Subjects.SubjectID"],["Student_Schedules","Classes","Student_Schedules.ClassID = Classes.ClassID"],["Student_Schedules","Student_Class_Status","Student_Schedules.ClassStatus = Student_Class_Status.ClassStatus"],["Student_Schedules","Students","Student_Schedules.StudentID = Students.StudentID"],["Students","Majors","Students.StudMajor = Majors.MajorID"],["Subjects","Categories","Subjects.CategoryID = Categories.CategoryID"],["Subjects","Subjects","Subjects.SubjectPreReq = Subjects.SubjectCode"]],"diff":{"added":[],"missing":["ztblGenderMatrix","ztblLetterGrades","ztblMaritalStatusMatrix","ztblProfRatings","ztblSemesterDays","ztblSeqNumbers"],"cols":[["Class_Rooms",[],["Capacity"]],["Classes",[],["SemesterNumber"]],["Students",["StudGPA"],["StudBirthDate","StudGender","StudMaritalStatus"]],["Subjects",[],["SubjectEstClassSize"]]]}},{"k":"bowlingleaguemodify","name":"BowlingLeagueModify","views":20,"tables":[{"n":"Bowler_Scores","rows":1344,"drv":false,"c":[["MatchID","integer",1,"Match_Games.MatchID"],["GameNumber","smallint",1,"Match_Games.GameNumber"],["BowlerID","integer",1,"Bowlers.BowlerID"],["RawScore","smallint",0,""],["HandiCapScore","smallint",0,""],["WonGame","smallint",0,""]]},{"n":"Bowler_Scores_Archive","rows":0,"drv":false,"c":[["MatchID","integer",1,"Match_Games_Archive.MatchID"],["GameNumber","smallint",1,"Match_Games_Archive.GameNumber"],["BowlerID","integer",1,""],["RawScore","smallint",0,""],["HandiCapScore","smallint",0,""],["WonGame","smallint",0,""]]},{"n":"Bowlers","rows":34,"drv":false,"c":[["BowlerID","integer",1,""],["BowlerLastName","varchar",0,""],["BowlerFirstName","varchar",0,""],["BowlerMiddleInit","varchar",0,""],["BowlerAddress","varchar",0,""],["BowlerCity","varchar",0,""],["BowlerState","varchar",0,""],["BowlerZip","varchar",0,""],["BowlerPhoneNumber","varchar",0,""],["TeamID","integer",0,"Teams.TeamID"],["BowlerTotalPins","integer",0,""],["BowlerGamesBowled","integer",0,""],["BowlerCurrentAverage","smallint",0,""],["BowlerCurrentHcp","smallint",0,""]]},{"n":"Match_Games","rows":168,"drv":false,"c":[["MatchID","integer",1,"Tourney_Matches.MatchID"],["GameNumber","smallint",1,""],["WinningTeamID","integer",0,""]]},{"n":"Match_Games_Archive","rows":0,"drv":false,"c":[["MatchID","integer",1,"Tourney_Matches_Archive.MatchID"],["GameNumber","smallint",1,""],["WinningTeamID","integer",0,""]]},{"n":"Teams","rows":10,"drv":false,"c":[["TeamID","integer",1,""],["TeamName","varchar",0,""],["CaptainID","integer",0,""]]},{"n":"Tournaments","rows":20,"drv":false,"c":[["TourneyID","integer",1,""],["TourneyDate","date",0,""],["TourneyLocation","varchar",0,""]]},{"n":"Tournaments_Archive","rows":0,"drv":false,"c":[["TourneyID","integer",1,""],["TourneyDate","date",0,""],["TourneyLocation","varchar",0,""]]},{"n":"Tourney_Matches","rows":57,"drv":false,"c":[["MatchID","integer",1,""],["TourneyID","integer",0,"Tournaments.TourneyID"],["Lanes","varchar",0,""],["OddLaneTeamID","integer",0,"Teams.TeamID"],["EvenLaneTeamID","integer",0,"Teams.TeamID"]]},{"n":"Tourney_Matches_Archive","rows":0,"drv":false,"c":[["MatchID","integer",1,""],["TourneyID","integer",0,"Tournaments_Archive.TourneyID"],["Lanes","varchar",0,""],["OddLaneTeamID","integer",0,""],["EvenLaneTeamID","integer",0,""]]},{"n":"WAZips","rows":523,"drv":false,"c":[["ZIP","varchar",1,""],["City","varchar",0,""],["State","varchar",0,""]]}],"joins":[["Bowler_Scores","Bowlers","Bowler_Scores.BowlerID = Bowlers.BowlerID"],["Bowler_Scores","Match_Games","Bowler_Scores.MatchID = Match_Games.MatchID AND Bowler_Scores.GameNumber = Match_Games.GameNumber"],["Bowler_Scores_Archive","Match_Games_Archive","Bowler_Scores_Archive.MatchID = Match_Games_Archive.MatchID AND Bowler_Scores_Archive.GameNumber = Match_Games_Archive.GameNumber"],["Bowlers","Teams","Bowlers.TeamID = Teams.TeamID"],["Match_Games","Tourney_Matches","Match_Games.MatchID = Tourney_Matches.MatchID"],["Match_Games_Archive","Tourney_Matches_Archive","Match_Games_Archive.MatchID = Tourney_Matches_Archive.MatchID"],["Tourney_Matches","Teams","Tourney_Matches.EvenLaneTeamID = Teams.TeamID"],["Tourney_Matches","Teams","Tourney_Matches.OddLaneTeamID = Teams.TeamID"],["Tourney_Matches","Tournaments","Tourney_Matches.TourneyID = Tournaments.TourneyID"],["Tourney_Matches_Archive","Tournaments_Archive","Tourney_Matches_Archive.TourneyID = Tournaments_Archive.TourneyID"]],"diff":{"added":["Bowler_Scores_Archive","Match_Games_Archive","Tournaments_Archive","Tourney_Matches_Archive","WAZips"],"missing":["ztblBowlerRatings","ztblSkipLabels","ztblWeeks"],"cols":[["Bowlers",["BowlerTotalPins","BowlerGamesBowled","BowlerCurrentAverage","BowlerCurrentHcp"],[]]]}}];
+var NOTES = {
+  salesordersexample: [
+    "Order_Details is the bridge between Orders and Products: one row per product on an order.",
+    "There's no stored order total. A line total is QuotedPrice * QuantityOrdered.",
+    "Product_Vendors is the bridge between Products and Vendors and holds WholesalePrice.",
+    "OrderDate and ShipDate are dates (no time), Sep 2017 to Mar 2018."
+  ],
+  entertainmentagencyexample: [
+    "Column prefixes: Agt (agents), Cust (customers), Ent (entertainers), Mbr (members).",
+    "Engagements is the hub: each booking links one Customer, one Agent and one Entertainer.",
+    "Bridges: Entertainer_Members, Entertainer_Styles and Musical_Preferences.",
+    "StartDate/EndDate are dates, StartTime/StopTime are times. Bookings run Sep 2017 to Mar 2018."
+  ],
+  schoolschedulingexample: [
+    "Underscored names: Class_Rooms, Student_Schedules, Faculty_Classes, Faculty_Subjects.",
+    "Staff is everyone employed; Faculty is the teaching subset with the same StaffID.",
+    "Student_Schedules is the bridge between Students and Classes and holds Grade and ClassStatus.",
+    "Subjects.SubjectPreReq holds another subject's SubjectCode (text): self join.",
+    "Classes has a 0/1 column for each weekday (MondaySchedule …)."
+  ],
+  bowlingleagueexample: [
+    "Bowler_Scores has a three-part key. Joining to Match_Games needs MatchID AND GameNumber.",
+    "Tourney_Matches has two team columns (OddLaneTeamID, EvenLaneTeamID): join Teams twice.",
+    "Teams.CaptainID and Match_Games.WinningTeamID are links without declared foreign keys.",
+    "WonGame is 1 for a win, 0 for a loss."
+  ],
+  recipesexample: [
+    "Recipe_Ingredients is the bridge between Recipes and Ingredients; RecipeSeqNo is the step order.",
+    "Recipe_Classes, Ingredient_Classes and Measurements are lookup tables.",
+    "Recipe_Ingredients has its own MeasureAmountID for the amount used in that recipe."
+  ],
+  student: [
+    "Names use underscores (first_name, course_no). Every table also has created_by, created_date, modified_by, modified_date.",
+    "A course is the catalog item; a section is one offering of it. Students enroll in sections.",
+    "Most timestamps are at 12:00 noon. Compare days with ::date.",
+    "A phone that was never entered is stored as '' (empty text), not NULL.",
+    "location is text: building letter + room number (L211).",
+    "Final exam scores are grade rows with grade_type_code = 'FI'. enrollment.final_grade is the overall course grade.",
+    "zipcode.state holds abbreviations only."
+  ]
+};
+var EXTRA_JOINS = {
+  bowlingleagueexample: [["Teams","Bowlers","Teams.CaptainID = Bowlers.BowlerID"],["Match_Games","Teams","Match_Games.WinningTeamID = Teams.TeamID"]],
+  bowlingleaguemodify: [["Teams","Bowlers","Teams.CaptainID = Bowlers.BowlerID"],["Match_Games","Teams","Match_Games.WinningTeamID = Teams.TeamID"]],
+  student: [["section","instructor","section.instructor_id = instructor.instructor_id"],["grade","section","grade.section_id = section.section_id"],["grade","student","grade.student_id = student.student_id"],["grade","grade_type","grade.grade_type_code = grade_type.grade_type_code"]]
+};
+var AUDIT = {created_by:1, created_date:1, modified_by:1, modified_date:1};
+
+var TASKS = [
+  ["Point queries at a schema", "SET search_path TO SalesOrdersExample;", "setup", "schema"],
+  ["Reset the textbook data", "Re-run LoadAllTextbookDatabases.sql", "setup", "restore reload"],
+  ["Show each value only once", "SELECT DISTINCT col", "select", "unique duplicates different"],
+  ["Sort highest first / Z to A", "ORDER BY col DESC", "select", "descending reverse"],
+  ["Break ties when sorting", "ORDER BY last_name, first_name", "select", "second sort then"],
+  ["Get the top N rows", "ORDER BY col DESC LIMIT 5", "select", "first highest"],
+  ["Rename an output column", "expression AS new_name", "select", "alias heading"],
+  ["Calculate a new column", "QuotedPrice * QuantityOrdered AS line_total", "expr", "math multiply arithmetic computed"],
+  ["Round a number", "ROUND(x, 2)", "expr", "decimal places"],
+  ["Divide and keep the decimals", "x::numeric / y", "expr", "integer division"],
+  ["Tell odd from even", "n % 2 = 1   -- odd", "expr", "modulo remainder"],
+  ["Match exact text", "WHERE col = 'Seattle'", "where", "equals"],
+  ["Match any value in a list", "WHERE col IN ('WA', 'OR')", "where", "list or several"],
+  ["Match a number range", "WHERE col BETWEEN 100 AND 199", "where", "between level"],
+  ["Text starts with / contains", "WHERE col LIKE 'A%'   /   '%bike%'", "where", "pattern wildcard begins"],
+  ["Ignore upper/lower case", "WHERE col ILIKE 'a%'", "where", "case insensitive"],
+  ["Names starting with a range of letters", "LIKE 'S%' OR …   /   BETWEEN 'S' AND 'X'", "where", "alphabet letters through"],
+  ["Find missing values", "WHERE col IS NULL OR col = ''", "null", "blank empty not entered"],
+  ["Find rows that have a value", "WHERE col IS NOT NULL", "null", "has"],
+  ["Replace NULL with something", "COALESCE(col, 'none')", "null", "default blank"],
+  ["Combine first and last name", "first_name || ' ' || last_name AS full_name", "text", "concatenate full name"],
+  ["Uppercase, or just the initial", "UPPER(col)   LEFT(col, 1)", "text", "capital first letter"],
+  ["Pull part of a text value", "SUBSTRING(col FROM 2 FOR 3)", "text", "characters middle"],
+  ["Turn text into a number", "CAST(x AS integer)   /   x::integer", "text", "convert"],
+  ["Compare a timestamp to a day", "col::date = '2017-10-01'", "dates", "date only"],
+  ["Get just the time", "col::time", "dates", "hour clock"],
+  ["Everything in one month", "col >= '2017-10-01' AND col < '2017-11-01'", "dates", "month range"],
+  ["Add or subtract days", "col + INTERVAL '90 days'", "dates", "future past later"],
+  ["Days between two dates", "end_date - start_date", "dates", "difference"],
+  ["Years between two dates", "EXTRACT(YEAR FROM AGE(CURRENT_DATE, d))", "dates", "age tenure"],
+  ["Pull out the year or month", "EXTRACT(MONTH FROM d)", "dates", "part"],
+  ["Format a date", "TO_CHAR(d, 'Mon DD, YYYY')", "dates", "display"],
+  ["If/then label", "CASE WHEN x >= 100 THEN 'Large' ELSE 'Small' END", "case", "conditional"],
+  ["Swap codes for names", "CASE col WHEN 'NY' THEN 'New York' END", "case", "lookup translate state"],
+  ["Data from two tables", "FROM a JOIN b ON a.key = b.key", "joins", "combine"],
+  ["Go through a bridge table", "JOIN bridge ON … JOIN other ON …", "joins", "many to many"],
+  ["Keep rows that have no match", "FROM a LEFT JOIN b ON …", "outer", "include all every even without"],
+  ["Find rows that never matched", "LEFT JOIN b ON … WHERE b.key IS NULL", "outer", "never missing without none"],
+  ["Use the same table twice", "JOIN t AS x ON … JOIN t AS y ON …", "morejoins", "self join alias"],
+  ["Every combination of two tables", "FROM a CROSS JOIN b", "morejoins", "cartesian pairs"],
+  ["Match a value to a range table", "JOIN r ON x BETWEEN r.LowPrice AND r.HighPrice", "morejoins", "bucket driver ztbl"],
+  ["Stack two result lists", "SELECT … UNION SELECT …", "sets", "combine append"],
+  ["Values in both lists / only the first", "INTERSECT   /   EXCEPT", "sets", "common difference"],
+  ["Count rows", "COUNT(*)", "agg", "how many number"],
+  ["Count unique values", "COUNT(DISTINCT col)", "agg", "different"],
+  ["Total, average, min, max", "SUM(x)  AVG(x)  MIN(x)  MAX(x)", "agg", "highest lowest largest smallest"],
+  ["Totals for each group", "SELECT g, COUNT(*) … GROUP BY g", "agg", "per each by"],
+  ["Show groups with a count of 0", "LEFT JOIN b … COUNT(b.key) … GROUP BY", "agg", "zero empty"],
+  ["Count only some rows", "COUNT(*) FILTER (WHERE …)", "agg", "conditional"],
+  ["List several values in one cell", "STRING_AGG(col, ', ')", "agg", "comma list"],
+  ["Filter on a total", "HAVING COUNT(*) > 5", "having", "more than at least groups"],
+  ["Compare each row to the average", "WHERE x > (SELECT AVG(x) FROM t)", "subq", "above below"],
+  ["Match against another query's results", "WHERE id IN (SELECT id FROM …)", "subq", "list"],
+  ["Check that a related row exists", "WHERE EXISTS (SELECT 1 FROM … WHERE …)", "subq", "has at least one"],
+  ["Rank rows", "RANK() OVER (ORDER BY x DESC)", "window", "ranking place"],
+  ["Number rows within each group", "ROW_NUMBER() OVER (PARTITION BY g ORDER BY x)", "window", "top per group"],
+  ["Running total", "SUM(x) OVER (ORDER BY d)", "window", "cumulative"],
+  ["Name a step, then use it", "WITH step AS (SELECT …) SELECT … FROM step", "cte", "temporary"],
+  ["Add rows", "INSERT INTO t (a, b) VALUES (…);", "modify", "new"],
+  ["Copy rows into another table", "INSERT INTO t (…) SELECT … FROM s;", "modify", "archive"],
+  ["Change values", "UPDATE t SET col = … WHERE …;", "modify", "edit"],
+  ["Delete rows", "DELETE FROM t WHERE …;", "modify", "remove"],
+  ["Test a change, then undo it", "BEGIN; … ROLLBACK;", "modify", "transaction safe"]
+];
+
+var ERRORS = [
+  ['relation "x" does not exist', "Postgres can't find that table.", "Check spelling and underscores (Class_Rooms), prefix the schema, or re-run SET search_path. Check the Query Tool bar says IS402Databases.", "setup"],
+  ['column "x" does not exist', "Unknown column. Also caused by \"double quotes\" around a text value, or by a SELECT alias used in WHERE.", "Check spelling. Text values use 'single quotes'. Repeat the formula instead of the alias.", "where"],
+  ['column reference "x" is ambiguous', "Two joined tables both have that column.", "Prefix it with the alias: c.CustomerID.", "joins"],
+  ['missing FROM-clause entry for table "x"', "You used a table name or alias that isn't in FROM/JOIN, often the full name after giving it an alias.", "Use the alias everywhere: o.OrderNumber, not Orders.OrderNumber.", "joins"],
+  ["cross-database references are not implemented", "Three dotted parts read as database.schema.table, usually an extra dot.", "Use schema.table: SalesOrdersExample.Orders.", "setup"],
+  ['syntax error at or near "x"', "Postgres got confused just before x.", "Look right before x: missing comma, missing quote, clause out of order, a comma before FROM.", "order"],
+  ["unterminated quoted string", "A ' was never closed.", "Close it. For an apostrophe inside text, double it: 'O''Brien'.", "text"],
+  ["operator does not exist: numeric ~~ unknown", "LIKE on a number column (~~ is LIKE).", "Use BETWEEN or >= / < for numbers.", "where"],
+  ["operator does not exist: character varying = integer", "A text column compared to an unquoted number.", "Quote it: zip = '10025'.", "where"],
+  ['invalid input syntax for type numeric: "x"', "Text that can't be read as that type (also integer, date).", "Check the value and quotes. Dates as 'YYYY-MM-DD'.", "expr"],
+  ["function round(real, integer) does not exist", "ROUND with decimal places needs a numeric value.", "ROUND(col::numeric, 2)", "expr"],
+  ['column "x" must appear in the GROUP BY clause or be used in an aggregate function', "A plain column sits in SELECT next to an aggregate.", "Add it to GROUP BY, or wrap it in an aggregate.", "agg"],
+  ["aggregate functions are not allowed in WHERE", "WHERE runs before groups exist.", "Move that condition to HAVING.", "having"],
+  ["window functions are not allowed in WHERE", "Window values are computed after WHERE.", "Compute in a subquery or CTE, filter outside.", "window"],
+  ["more than one row returned by a subquery used as an expression", "= (SELECT …) got several rows.", "Use IN (SELECT …), or make it return one row.", "subq"],
+  ["subquery has too many columns", "IN (SELECT a, b …).", "Select exactly one column inside IN.", "subq"],
+  ["each UNION query must have the same number of columns", "The SELECTs list different numbers of columns.", "Make the column lists line up.", "sets"],
+  ["UNION types integer and character varying cannot be matched", "A column is a number in one SELECT and text in the other.", "Line up matching columns, or cast one.", "sets"],
+  ["division by zero", "A divisor is 0.", "x / NULLIF(y, 0) returns NULL instead.", "expr"],
+  ['date/time field value out of range: "x"', "An impossible or misread date ('2017-02-30', '13/01/2017').", "Use real dates in 'YYYY-MM-DD'.", "dates"],
+  ["duplicate key value violates unique constraint", "INSERT used a primary key that already exists.", "Use a new key value; check with SELECT first.", "modify"],
+  ['null value in column "x" … violates not-null constraint', "INSERT left out a required column.", "Add it to the column list and VALUES.", "modify"],
+  ['update or delete on table "x" violates foreign key constraint', "Other rows still point at the row you're deleting.", "Delete the child rows first (Order_Details before Orders).", "modify"],
+  ['insert or update on table "x" violates foreign key constraint', "The new value points to a parent row that doesn't exist.", "Insert the parent first, or fix the ID.", "modify"],
+  ["INSERT has more expressions than target columns", "VALUES has more items than the column list.", "Match them one to one.", "modify"],
+  ["current transaction is aborted, commands ignored until end of transaction block", "A statement inside BEGIN failed.", "Run ROLLBACK; then start again.", "modify"]
+];
+
+
+(function () {
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+  /* Nav model from the sidebar */
+  var nav = document.getElementById("side");
+  var ORDERLIST = [], TITLE = {}, GROUP = {}, grp = "";
+  Array.prototype.forEach.call(nav.children, function (el) {
+    if (el.classList.contains("grp")) { grp = el.textContent; return; }
+    var id = el.getAttribute("href").slice(1);
+    TITLE[id] = el.textContent; GROUP[id] = grp;
+    if (id !== "home") ORDERLIST.push(id);
+  });
+
+  /* Home topic groups */
+  var gh = "", groupsSeen = [];
+  ORDERLIST.forEach(function (id) {
+    var g = GROUP[id]; if (g === "Quick help") return;
+    if (groupsSeen.indexOf(g) === -1) groupsSeen.push(g);
+  });
+  document.getElementById("groups").innerHTML = groupsSeen.map(function (g) {
+    return "<div><h3>" + esc(g) + "</h3><ul>" + ORDERLIST.filter(function (id) { return GROUP[id] === g; }).map(function (id) {
+      return '<li><a href="#' + id + '">' + esc(TITLE[id]) + "</a></li>";
+    }).join("") + "</ul></div>";
+  }).join("");
+
+  /* SQL highlighting + copy */
+  var KW = "SELECT|FROM|WHERE|AND|OR|NOT|IN|IS|NULL|LIKE|ILIKE|BETWEEN|ORDER|BY|GROUP|HAVING|LIMIT|OFFSET|AS|ON|JOIN|LEFT|RIGHT|FULL|OUTER|INNER|CROSS|USING|UNION|ALL|INTERSECT|EXCEPT|DISTINCT|CASE|WHEN|THEN|ELSE|END|EXISTS|ANY|WITH|INSERT|INTO|VALUES|UPDATE|SET|DELETE|RETURNING|BEGIN|COMMIT|ROLLBACK|DESC|ASC|NULLS|LAST|FIRST|OVER|PARTITION|FILTER|INTERVAL|CAST|SHOW|TO|DROP|SCHEMA|CASCADE";
+  var re = new RegExp("(--[^\\n]*)|('(?:[^']|'')*')|\\b(" + KW + ")\\b", "g");
+  function hl(src) {
+    var out = "", last = 0, m; re.lastIndex = 0;
+    while ((m = re.exec(src))) {
+      out += esc(src.slice(last, m.index));
+      out += m[1] ? '<span class="c">' + esc(m[1]) + "</span>" : m[2] ? '<span class="s">' + esc(m[2]) + "</span>" : '<span class="k">' + esc(m[3]) + "</span>";
+      last = re.lastIndex;
+    }
+    return out + esc(src.slice(last));
+  }
+  function decorate(root) {
+    root.querySelectorAll(".code").forEach(function (box) {
+      var code = box.querySelector("pre code"); if (!code || box.dataset.done) return;
+      box.dataset.done = "1";
+      var raw = code.textContent; code.innerHTML = hl(raw);
+      if (box.querySelector(".cap")) box.classList.add("capd");
+      var b = document.createElement("button"); b.type = "button"; b.textContent = "Copy";
+      b.addEventListener("click", function () {
+        var ok = function () { b.textContent = "Copied"; setTimeout(function () { b.textContent = "Copy"; }, 1300); };
+        var sel = function () { var r = document.createRange(); r.selectNodeContents(code); var s = getSelection(); s.removeAllRanges(); s.addRange(r); };
+        try { navigator.clipboard.writeText(raw).then(ok, sel); } catch (e) { sel(); }
+      });
+      box.appendChild(b);
+    });
+  }
+  decorate(document);
+
+  /* Pager on topic views */
+  ORDERLIST.forEach(function (id, i) {
+    var sec = document.getElementById("v-" + id); if (!sec) return;
+    var prev = ORDERLIST[i - 1], next = ORDERLIST[i + 1];
+    var html = '<nav class="pager" aria-label="Previous and next topic">';
+    if (prev) html += '<a class="prev" href="#' + prev + '"><small>Previous</small><span>← ' + esc(TITLE[prev]) + "</span></a>";
+    if (next) html += '<a class="next" href="#' + next + '"><small>Next</small><span>' + esc(TITLE[next]) + " →</span></a>";
+    sec.insertAdjacentHTML("beforeend", html + "</nav>");
+  });
+
+  /* Tasks */
+  var tl = document.getElementById("task-list");
+  function renderTasks(f) {
+    f = (f || "").trim().toLowerCase();
+    var html = "", byGroup = {};
+    TASKS.forEach(function (t) {
+      if (f && (t[0] + " " + t[1] + " " + t[3]).toLowerCase().indexOf(f) === -1) return;
+      var g = GROUP[t[2]]; (byGroup[g] = byGroup[g] || []).push(t);
+    });
+    ["Start", "Reading data", "Combining tables", "Summarizing", "Nesting", "Changing data"].forEach(function (g) {
+      if (!byGroup[g]) return;
+      html += "<h3>" + esc(g) + "</h3>" + byGroup[g].map(function (t) {
+        return '<a href="#' + t[2] + '"><span>' + esc(t[0]) + "</span><code>" + esc(t[1]) + "</code></a>";
+      }).join("");
+    });
+    tl.innerHTML = html || '<p class="use">No matching task. Try the search bar.</p>';
+  }
+  renderTasks("");
+  document.getElementById("task-filter").addEventListener("input", function (e) { renderTasks(e.target.value); });
+
+  /* Errors */
+  var el = document.getElementById("err-list");
+  function renderErrors(f) {
+    f = (f || "").trim().toLowerCase();
+    el.innerHTML = ERRORS.filter(function (e) { return !f || (e[0] + " " + e[1] + " " + e[2]).toLowerCase().indexOf(f) > -1; }).map(function (e) {
+      return '<div class="err"><code>' + esc(e[0]) + "</code><p><span>" + esc(e[1]) + "</span> " + esc(e[2]) + ' <a href="#' + e[3] + '">' + esc(TITLE[e[3]]) + " →</a></p></div>";
+    }).join("") || '<p class="use">No matching error. Try a shorter phrase.</p>';
+  }
+  renderErrors("");
+  var keepErr = false;
+  document.getElementById("err-filter").addEventListener("input", function (e) { renderErrors(e.target.value); });
+
+  /* Schemas */
+  var sel = document.getElementById("sch"), sv = document.getElementById("schema-view"), meta = document.getElementById("sch-meta");
+  var segT = document.getElementById("seg-tables"), segJ = document.getElementById("seg-joins");
+  var mode = lsGet("is402-sch-mode") === "joins" ? "joins" : "tables", current = null;
+  sel.innerHTML = '<optgroup label="Example (SELECT)">' + SCHEMAS.filter(function (s) { return !/modify$/.test(s.k); }).map(function (s) { return '<option value="' + s.k + '">' + esc(s.name) + "</option>"; }).join("") + "</optgroup>" +
+    '<optgroup label="Modify (INSERT/UPDATE/DELETE)">' + SCHEMAS.filter(function (s) { return /modify$/.test(s.k); }).map(function (s) { return '<option value="' + s.k + '">' + esc(s.name) + "</option>"; }).join("") + "</optgroup>";
+  sel.addEventListener("change", function () { showSchema(sel.value); });
+  segT.addEventListener("click", function () { mode = "tables"; lsSet("is402-sch-mode", mode); showSchema(current); });
+  segJ.addEventListener("click", function () { mode = "joins"; lsSet("is402-sch-mode", mode); showSchema(current); });
+
+  function card(t) {
+    var rows = t.c.map(function (c) {
+      var tags = (c[2] ? '<span class="tag pk">PK</span>' : "") + (c[3] ? '<span class="tag fk" title="→ ' + esc(c[3]) + '">FK</span>' : "");
+      return '<li data-col="' + esc(c[0].toLowerCase()) + '"' + (AUDIT[c[0]] ? ' class="aud"' : "") + "><span>" + esc(c[0]) + tags + '</span><span class="t">' + esc(c[1]) + "</span></li>";
+    }).join("");
+    return '<article class="ent" id="t-' + current + "-" + esc(t.n.toLowerCase()) + '"><header><b>' + esc(t.n) + "</b><small>" + (t.rows == null ? "" : t.rows.toLocaleString() + " rows") + "</small></header><ul>" + rows + "</ul></article>";
+  }
+  function codeify(txt) { return esc(txt).replace(/(\b[A-Za-z_]+\.[A-Za-z_]+\b|'FI'|''|::date)/g, "<code>$1</code>"); }
+  function showSchema(k, focusTable, focusCol) {
+    var s = SCHEMAS.filter(function (x) { return x.k === k; })[0] || SCHEMAS[0];
+    current = s.k; sel.value = s.k; lsSet("is402-schema", s.k);
+    segT.setAttribute("aria-selected", mode === "tables"); segJ.setAttribute("aria-selected", mode === "joins");
+    var isMod = /modify$/.test(s.k);
+    meta.textContent = s.tables.length + " tables";
+    var items = [];
+    if (isMod) {
+      items.push("Practice copy of <code>" + esc(s.name.replace("Modify", "Example")) + "</code> for changing data. Reset by re-running <code>LoadAllTextbookDatabases.sql</code>.");
+      var d = s.diff;
+      if (d.added.length) items.push("Only here: " + d.added.map(function (x) { return "<code>" + esc(x) + "</code>"; }).join(", ") + ".");
+      d.cols.forEach(function (c) {
+        var parts = [];
+        if (c[1].length) parts.push("adds " + c[1].map(function (x) { return "<code>" + esc(x) + "</code>"; }).join(", "));
+        if (c[2].length) parts.push("drops " + c[2].map(function (x) { return "<code>" + esc(x) + "</code>"; }).join(", "));
+        items.push("<code>" + esc(c[0]) + "</code> " + parts.join("; ") + ".");
+      });
+    } else {
+      (NOTES[s.k] || []).forEach(function (n) { items.push(codeify(n)); });
+    }
+    var html = '<div class="code"><pre><code>SET search_path TO ' + esc(s.name) + ";</code></pre></div>";
+    html += '<ul class="sch-notes">' + items.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+    if (mode === "joins") {
+      var joins = s.joins.map(function (j) { return [j[0], j[1], j[2], ""]; }).concat((EXTRA_JOINS[s.k] || []).map(function (j) { return [j[0], j[1], j[2], "no declared FK"]; }));
+      html += '<div class="tw plain"><table><thead><tr><th>From</th><th>To</th><th>ON</th></tr></thead><tbody>' +
+        joins.map(function (j) { return "<tr><td>" + esc(j[0]) + "</td><td>" + esc(j[1]) + '</td><td class="wrap"><code>' + esc(j[2]) + "</code>" + (j[3] ? ' <span class="c">' + j[3] + "</span>" : "") + "</td></tr>"; }).join("") + "</tbody></table></div>";
+    } else {
+      var main = s.tables.filter(function (t) { return !t.drv; }), drv = s.tables.filter(function (t) { return t.drv; });
+      html += '<div class="er">' + main.map(card).join("") + "</div>";
+      if (drv.length) html += '<details class="drv"><summary>Driver tables (' + drv.length + ")</summary><div class=\"er\">" + drv.map(card).join("") + "</div></details>";
+    }
+    sv.innerHTML = html; decorate(sv);
+    if (focusTable) {
+      var t = document.getElementById("t-" + s.k + "-" + focusTable.toLowerCase());
+      if (t) {
+        var d2 = t.closest("details"); if (d2) d2.open = true;
+        if (focusCol) { var li = t.querySelector('li[data-col="' + focusCol.toLowerCase() + '"]'); if (li) li.classList.add("hit"); }
+        setTimeout(function () { t.scrollIntoView({ block: "center" }); t.classList.add("flash"); setTimeout(function () { t.classList.remove("flash"); }, 1600); }, 30);
+      }
+    }
+  }
+  showSchema(lsGet("is402-schema") || "salesordersexample");
+
+  /* Mobile drawer */
+  var menu = document.getElementById("menu");
+  function closeNav() { document.body.classList.remove("nav-open"); menu.setAttribute("aria-expanded", "false"); }
+  menu.addEventListener("click", function () { var o = document.body.classList.toggle("nav-open"); menu.setAttribute("aria-expanded", o ? "true" : "false"); });
+  document.getElementById("scrim").addEventListener("click", closeNav);
+
+  /* Router: one view at a time */
+  var views = document.querySelectorAll("main .view");
+  var links = nav.querySelectorAll("a");
+  function route() {
+    var id = location.hash.slice(1) || "home";
+    if (id.indexOf("s-") === 0) { mode = "tables"; showSchema(id.slice(2)); id = "schemas"; }
+    if (!document.getElementById("v-" + id)) id = "home";
+    if (id === "errors" && !keepErr) { document.getElementById("err-filter").value = ""; renderErrors(""); }
+    keepErr = false;
+    views.forEach(function (v) { v.hidden = v.id !== "v-" + id; });
+    links.forEach(function (a) {
+      if (a.getAttribute("href") === "#" + id) { a.setAttribute("aria-current", "page"); var r = a.getBoundingClientRect(), nr = nav.getBoundingClientRect(); if (r.top < nr.top || r.bottom > nr.bottom) nav.scrollTop += r.top - nr.top - 80; }
+      else a.removeAttribute("aria-current");
+    });
+    document.title = id === "home" ? "IS 402 SQL Handbook" : TITLE[id] + " · IS 402 SQL Handbook";
+    window.scrollTo(0, 0);
+    requestAnimationFrame(function () { window.scrollTo(0, 0); });
+    closeNav();
+  }
+  window.addEventListener("hashchange", route);
+  route();
+
+  /* Search */
+  var INDEX = [];
+  TASKS.forEach(function (t) { INDEX.push({ g: "Tasks", t: t[0], d: t[1], h: "#" + t[2], s: (t[0] + " " + t[1] + " " + t[3]).toLowerCase() }); });
+  document.querySelectorAll("main .view").forEach(function (s) {
+    var id = s.id.slice(2); if (id === "home") return;
+    INDEX.push({ g: "Topics", t: TITLE[id], d: GROUP[id], h: "#" + id, s: (TITLE[id] + " " + (s.dataset.keys || "")).toLowerCase() });
+  });
+  ERRORS.forEach(function (e) { INDEX.push({ g: "Errors", t: e[0], d: e[2], h: "#errors", s: (e[0] + " " + e[1] + " " + e[2] + " error").toLowerCase(), err: e[0] }); });
+  SCHEMAS.forEach(function (s) {
+    INDEX.push({ g: "Schemas", t: s.name, d: s.tables.length + " tables", h: "#s-" + s.k, s: s.name.toLowerCase() + " schema", k: s.k });
+    s.tables.forEach(function (t) {
+      INDEX.push({ g: "Tables & columns", t: t.n, d: s.name, h: "#schemas", s: t.n.toLowerCase(), k: s.k, tbl: t.n });
+      t.c.forEach(function (c) {
+        if (AUDIT[c[0]]) return;
+        INDEX.push({ g: "Tables & columns", t: t.n + "." + c[0], d: s.name + " · " + c[1] + (c[3] ? " → " + c[3] : ""), h: "#schemas", s: (t.n + "." + c[0]).toLowerCase(), k: s.k, tbl: t.n, col: c[0], low: 1 });
+      });
+    });
+  });
+  var LIMITS = { Topics: 4, Tasks: 6, Errors: 4, Schemas: 3, "Tables & columns": 7 };
+  var GORDER = ["Topics", "Tasks", "Errors", "Schemas", "Tables & columns"];
+  var q = document.getElementById("q"), res = document.getElementById("results"), hits = [];
+  function search(v) {
+    v = v.trim().toLowerCase();
+    if (!v) { res.hidden = true; res.innerHTML = ""; return; }
+    var words = v.split(/\s+/), groups = {};
+    INDEX.forEach(function (it, i) {
+      if (it.low && v.length < 3) return;
+      for (var w = 0; w < words.length; w++) if (it.s.indexOf(words[w]) === -1) return;
+      var tl2 = it.t.toLowerCase(), sc = tl2.indexOf(v) === 0 ? 0 : tl2.indexOf(v) > -1 ? 1 : 2;
+      (groups[it.g] = groups[it.g] || []).push({ it: it, sc: sc, i: i });
+    });
+    hits = []; var html = "";
+    GORDER.forEach(function (g) {
+      var arr = groups[g]; if (!arr) return;
+      arr.sort(function (a, b) { return a.sc - b.sc || a.i - b.i; });
+      html += "<h4>" + g + "</h4>";
+      arr.slice(0, LIMITS[g]).forEach(function (x) {
+        var n = hits.push(x.it) - 1;
+        html += '<a href="' + x.it.h + '" data-n="' + n + '"' + (g === "Topics" ? ' class="tp"' : "") + '><span class="rt">' + esc(x.it.t) + '</span><span class="rd">' + esc(x.it.d) + "</span></a>";
+      });
+    });
+    res.innerHTML = html || '<div class="none">No matches. Try a shorter word.</div>';
+    res.hidden = false;
+  }
+  function closeResults() { res.hidden = true; }
+  q.addEventListener("input", function () { search(q.value); });
+  q.addEventListener("focus", function () { if (q.value) search(q.value); });
+  q.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") { q.value = ""; search(""); q.blur(); }
+    if (e.key === "Enter") { var a = res.querySelector("a"); if (a) { e.preventDefault(); a.click(); } }
+    if (e.key === "ArrowDown") { var f = res.querySelector("a"); if (f) { e.preventDefault(); f.focus(); } }
+  });
+  res.addEventListener("keydown", function (e) {
+    var list = Array.prototype.slice.call(res.querySelectorAll("a")), i = list.indexOf(document.activeElement);
+    if (i < 0) return;
+    if (e.key === "ArrowDown" && list[i + 1]) { e.preventDefault(); list[i + 1].focus(); }
+    if (e.key === "ArrowUp") { e.preventDefault(); (list[i - 1] || q).focus(); }
+    if (e.key === "Escape") { closeResults(); q.focus(); }
+  });
+  res.addEventListener("click", function (e) {
+    var a = e.target.closest("a"); if (!a) return;
+    var it = hits[+a.dataset.n];
+    closeResults(); q.blur();
+    if (it && it.err) { e.preventDefault(); keepErr = true; document.getElementById("err-filter").value = it.err; renderErrors(it.err); if (location.hash !== "#errors") location.hash = "errors"; else route(); return; }
+    if (it && it.k) {
+      e.preventDefault(); mode = "tables";
+      if (location.hash !== "#schemas") { location.hash = "schemas"; }
+      setTimeout(function () { showSchema(it.k, it.tbl, it.col); }, 60);
+    }
+  });
+  document.addEventListener("click", function (e) { if (!e.target.closest(".search")) closeResults(); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "/" && document.activeElement !== q && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { e.preventDefault(); q.focus(); }
+  });
+})();
+</script>
+
+</body></html>
